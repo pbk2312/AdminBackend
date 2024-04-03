@@ -28,8 +28,9 @@ class MemberRepositoryTest {
     public void testInserts() {
         IntStream.rangeClosed(1, 100).forEach(i -> {
             Member member = Member.builder()
-                    .mid("member" + i)
-                    .mpw(passwordEncoder.encode("1111"))
+                    .name("member" + i)
+                    .password(passwordEncoder.encode("1111"))
+                    .email("asdawda@naver.com" + i)
                     .role(Role.Venture)
                     .build();
             memberRepository.save(member);

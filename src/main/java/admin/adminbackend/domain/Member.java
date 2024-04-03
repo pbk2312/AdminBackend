@@ -18,15 +18,18 @@ public class Member {
 
 
     @Id
-    private String mid;
-    private String mpw;
+    private String name;
+    private String password;
+    private String email;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public void changePw(String mpw) {
-        this.mpw = mpw;
+    public void changePw(String password) {
+        this.password = password;
     }
-
+    public void changeEmail(String email){
+        this.email = email;
+    }
 
 }
