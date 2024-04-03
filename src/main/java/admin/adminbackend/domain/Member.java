@@ -5,8 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Entity
 @Getter
@@ -18,11 +18,15 @@ public class Member {
 
 
     @Id
+    @NotEmpty
     private String name;
+    @NotEmpty
     private String password;
+    @NotEmpty
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @NotEmpty
     private Role role;
 
     public void changePw(String password) {

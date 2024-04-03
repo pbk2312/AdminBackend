@@ -35,6 +35,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
+    implementation 'javax.validation:validation-api'
+    implementation 'org.hibernate.validator:hibernate-validator'
+
+
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
 
