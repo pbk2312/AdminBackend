@@ -3,6 +3,12 @@ package admin.adminbackend.repository;
 import admin.adminbackend.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MemberRepository extends JpaRepository<Member,String> {
+import java.util.Optional;
+
+public interface MemberRepository extends JpaRepository<Member, Long> {
+    Optional<Member> findByEmail(String email);
+
+    // 존재 여부
+    boolean existsEmail(String email);
 
 }

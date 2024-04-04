@@ -17,17 +17,6 @@ import java.util.List;
 public class LogInController {
 
 
-    @GetMapping("/login")
-    public String login() {
-        log.info("login....");
-        return "ok";
-    }
-
-
-    @PostMapping("/login")
-    public String loginPOST() {
-        return "ok";
-    }
 
 
 

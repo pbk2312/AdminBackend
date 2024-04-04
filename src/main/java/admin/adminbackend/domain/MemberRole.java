@@ -1,9 +1,7 @@
 package admin.adminbackend.domain;
 
-public enum Role {
+public enum MemberRole {
 
     Venture,
     Person
-
-
 }
