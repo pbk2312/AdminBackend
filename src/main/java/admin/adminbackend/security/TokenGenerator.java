@@ -1,6 +1,6 @@
 package admin.adminbackend.security;
 
-import admin.adminbackend.dto.ToeknDTO;
+import admin.adminbackend.dto.TokenDTO;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -37,7 +37,7 @@ public class TokenGenerator {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public ToeknDTO generateTokenDto(Authentication authentication) {
+    public TokenDTO generateTokenDto(Authentication authentication) {
         // 권한들 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -60,7 +60,7 @@ public class TokenGenerator {
                 .setExpiration(new Date(now + RefreshTokenExpireTime))
                 .compact();
 
-        return ToeknDTO.builder()
+        return TokenDTO.builder()
                 .grantType(BEARERTYPE)
                 .refreshToken(refreshToken)
                 .accessToken(accessToken)

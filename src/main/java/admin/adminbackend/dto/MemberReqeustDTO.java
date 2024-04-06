@@ -15,18 +15,19 @@ public class MemberReqeustDTO {
 
     private String email;
     private String password;
+    private MemberRole memberRole;
 
-    public Member toMember(PasswordEncoder passwordEncoder){
+    public Member toMember(PasswordEncoder passwordEncoder) {
         return Member.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
-                .memberRole(MemberRole.Person)
+                .memberRole(memberRole)
                 .build();
     }
+
     public UsernamePasswordAuthenticationToken toAuthentication() {
         return new UsernamePasswordAuthenticationToken(email, password);
     }
-
 
 
 }

@@ -1,7 +1,6 @@
 package admin.adminbackend.dto;
 
 
-import admin.adminbackend.domain.RefreshToken;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ToeknDTO {
+public class TokenDTO {
 
     private String grantType;
     private String accessToken;
