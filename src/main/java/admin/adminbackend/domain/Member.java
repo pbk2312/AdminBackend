@@ -1,13 +1,14 @@
 package admin.adminbackend.domain;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.*;
+import org.springframework.stereotype.Service;
 
 @Entity
 @Getter
+@Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Member {
 

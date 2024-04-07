@@ -15,10 +15,10 @@ public class LoginDTO {
 
     @NotNull
     @Size(min = 3, max = 50)
-    private String name;
+    private String email;
 
     @NotNull
-    @Size(min = 6, max = 100)
+    @Size(min = 3, max = 100)
     private String password;
 
 

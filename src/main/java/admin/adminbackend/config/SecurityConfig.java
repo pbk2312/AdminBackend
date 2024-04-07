@@ -1,14 +1,13 @@
 package admin.adminbackend.config;
 
-import admin.adminbackend.filter.handler.JwtAccessDeniedHandler;
-import admin.adminbackend.filter.handler.JwtAuthFailHandler;
-import admin.adminbackend.security.TokenGenerator;
+import admin.adminbackend.jwt.JwtAccessDeniedHandler;
+import admin.adminbackend.jwt.JwtAuthenticationEntryPoint;
+import admin.adminbackend.jwt.JwtSecurityConfig;
+import admin.adminbackend.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,15 +16,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
-@EnableWebSecurity
-@Log4j2
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final TokenGenerator tokenGenerator;
-    private final JwtAuthFailHandler jwtAuthFailHandler;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final TokenProvider tokenProvider;
     private final CorsFilter corsFilter;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,7 +36,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(jwtAuthFailHandler)
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                         .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
                 .headers(headers -> headers
@@ -52,7 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/member/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .with(new JwtSecurityConfig(tokenGenerator), jwtSecurityConfig -> {
+                .with(new JwtSecurityConfig(tokenProvider), jwtSecurityConfig -> {
                     // JwtSecurityConfig에 대한 커스터마이즈 작업을 수행합니다.
                 });
 
