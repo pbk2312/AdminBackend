@@ -60,6 +60,7 @@ public class TokenProvider {
                 .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
                 .compact();
 
+        // TokenDTO를 생성해서 반환
         return TokenDTO.builder()
                 .grantType(BEARER_TYPE)
                 .refreshToken(refreshToken)
