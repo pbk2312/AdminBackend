@@ -1,24 +1,25 @@
 package admin.adminbackend.service;
 
 
+import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.RefreshToken;
-import admin.adminbackend.dto.MemberReqeustDTO;
-import admin.adminbackend.dto.MemberResponseDTO;
-import admin.adminbackend.dto.TokenDTO;
-import admin.adminbackend.dto.TokenRequestDTO;
+import admin.adminbackend.dto.*;
+import admin.adminbackend.email.EmailProvider;
+import admin.adminbackend.repository.EmailRepository;
 import admin.adminbackend.repository.MemberRepository;
 import admin.adminbackend.repository.RefreshTokenRepository;
 import admin.adminbackend.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -31,19 +32,54 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final EmailProvider emailProvider;
+    private final EmailRepository emailRepository;
+
 
     @Transactional
-    public MemberResponseDTO register(MemberReqeustDTO memberReqeustDTO) {
-        if (memberRepository.existsByEmail(memberReqeustDTO.getEmail())) {
+    public MemberResponseDTO register(MemberRequestDTO memberRequestDTO) {
+        // 이메일로 인증번호 조회
+        EmailCertification emailCertification = emailRepository.findByCertificationEmail(memberRequestDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("인증번호를 찾을 수 없습니다."));
+
+        // 사용자가 입력한 인증번호와 DB에 저장된 인증번호를 비교합니다.
+        if (!emailCertification.getCertificationNumber().equals(memberRequestDTO.getCertificationNumber())) {
+            throw new RuntimeException("인증번호가 일치하지 않습니다.");
+        }
+
+        // 인증번호가 일치하고, 해당 이메일로 가입된 회원이 있는지 확인
+        if (memberRepository.existsByEmail(memberRequestDTO.getEmail())) {
             throw new RuntimeException("이미 가입되어 있는 회원입니다");
         }
 
-        Member member = memberReqeustDTO.toMember(passwordEncoder);
-        return MemberResponseDTO.of(memberRepository.save(member));
+        // 인증번호 확인 후 회원 가입 진행
+        Member member = memberRequestDTO.toMember(passwordEncoder);
+        Member savedMember = memberRepository.save(member);
+
+        return MemberResponseDTO.of(savedMember);
     }
 
+
     @Transactional
-    public TokenDTO login(MemberReqeustDTO memberRequestDTO) {
+    public EmailResponseDTO sendCertificationMail(EmailRequestDTO emailRequestDTO) {
+
+        // 회원가입 이메일 보내기
+        String certificationNumber = generateCertificationNumber(); // 인증번호 생성
+        boolean emailSent = emailProvider.sendCertificationMail(emailRequestDTO.getEmail(), certificationNumber);
+        if (!emailSent) {
+            throw new RuntimeException("이메일 발송에 실패했습니다.");
+        }
+
+        EmailCertification email = emailRequestDTO.toEmail(certificationNumber);
+        EmailCertification saveEmail = emailRepository.save(email);
+
+        return EmailResponseDTO.of(saveEmail);
+
+    }
+
+
+    @Transactional
+    public TokenDTO login(MemberRequestDTO memberRequestDTO) {
         log.info("로그인 시도: 사용자 아이디={}", memberRequestDTO.getEmail());
 
         // 1. 로그인 ID/PW를 기반으로 AuthenticationToken 생성
@@ -102,6 +138,19 @@ public class AuthService {
 
         return tokenDTO;
 
+    }
+
+
+    // 난수 생성 메서드
+    private String generateCertificationNumber() {
+        int length = 6; // 인증번호 길이
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            int digit = random.nextInt(10); // 0부터 9까지의 난수 생성
+            sb.append(digit);
+        }
+        return sb.toString();
     }
 
 
