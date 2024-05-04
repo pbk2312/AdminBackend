@@ -1,6 +1,14 @@
 package admin.adminbackend.controller;
 ////
-import admin.adminbackend.dto.*;
+
+import admin.adminbackend.dto.email.EmailRequestDTO;
+import admin.adminbackend.dto.email.EmailResponseDTO;
+import admin.adminbackend.dto.login.LoginDTO;
+import admin.adminbackend.dto.login.LogoutDTO;
+import admin.adminbackend.dto.register.MemberRequestDTO;
+import admin.adminbackend.dto.register.MemberResponseDTO;
+import admin.adminbackend.dto.token.TokenDTO;
+import admin.adminbackend.dto.token.TokenRequestDTO;
 import admin.adminbackend.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +29,9 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> login(@RequestBody MemberRequestDTO memberRequestDTO) {
+    public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO loginDTO) {
         log.info("로그인 요청이 들어왔습니다.");
-        TokenDTO tokenDTO = authService.login(memberRequestDTO);
+        TokenDTO tokenDTO = authService.login(loginDTO);
         log.info("로그인이 완료되었습니다. 반환된 토큰: {}", tokenDTO);
         return ResponseEntity.ok(tokenDTO);
     }
@@ -37,6 +45,16 @@ public class AuthController {
     @PostMapping("/sendCertification")
     public ResponseEntity<EmailResponseDTO> sendCertification(@RequestBody EmailRequestDTO emailRequestDTO) {
         return ResponseEntity.ok(authService.sendCertificationMail(emailRequestDTO));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutDTO> logout(@RequestBody LogoutDTO logoutDTO) {
+        return ResponseEntity.ok(authService.logout(logoutDTO));
+    }
+
+    @PostMapping("/withdrawalMembership")
+    public ResponseEntity<MemberResponseDTO> withdrawalMembership(@RequestBody LoginDTO loginDTO) {
+        return ResponseEntity.ok(authService.withdrawalMembership(loginDTO));
     }
 
 

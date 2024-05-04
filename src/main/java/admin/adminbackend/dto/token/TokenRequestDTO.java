@@ -1,4 +1,4 @@
-package admin.adminbackend.dto;
+package admin.adminbackend.dto.token;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

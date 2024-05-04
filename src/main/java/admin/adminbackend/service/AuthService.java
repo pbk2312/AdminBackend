@@ -4,7 +4,14 @@ package admin.adminbackend.service;
 import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.RefreshToken;
-import admin.adminbackend.dto.*;
+import admin.adminbackend.dto.email.EmailRequestDTO;
+import admin.adminbackend.dto.email.EmailResponseDTO;
+import admin.adminbackend.dto.login.LoginDTO;
+import admin.adminbackend.dto.login.LogoutDTO;
+import admin.adminbackend.dto.register.MemberRequestDTO;
+import admin.adminbackend.dto.register.MemberResponseDTO;
+import admin.adminbackend.dto.token.TokenDTO;
+import admin.adminbackend.dto.token.TokenRequestDTO;
 import admin.adminbackend.email.EmailProvider;
 import admin.adminbackend.repository.EmailRepository;
 import admin.adminbackend.repository.MemberRepository;
@@ -19,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -35,6 +43,7 @@ public class AuthService {
     private final EmailProvider emailProvider;
     private final EmailRepository emailRepository;
 
+    // 회원가입
 
     @Transactional
     public MemberResponseDTO register(MemberRequestDTO memberRequestDTO) {
@@ -60,6 +69,89 @@ public class AuthService {
     }
 
 
+    // 탈퇴하기
+    @Transactional
+    public MemberResponseDTO withdrawalMembership(LoginDTO loginDTO){
+        String withdrawalMembershipEmail = loginDTO.getEmail();
+        String withdrawalMembershipPassword = loginDTO.getPassword();
+
+        // 해당 이메일로 회원을 찾습니다.
+        Member member = memberRepository.findByEmail(withdrawalMembershipEmail)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+        // 회원의 비밀번호를 확인합니다.
+        if (!passwordEncoder.matches(withdrawalMembershipPassword, member.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 해당 회원의 RefreshToken을 삭제합니다.
+        refreshTokenRepository.deleteByEmail(withdrawalMembershipEmail);
+
+        // 회원을 삭제합니다.
+        memberRepository.delete(member);
+
+        log.info("회원탈퇴가 완료되었습니다.");
+
+        return MemberResponseDTO.of(member);
+    }
+
+
+
+
+    // 로그인 시도
+    @Transactional
+    public TokenDTO login(LoginDTO loginDTO) {
+        log.info("로그인 시도: 사용자 아이디={}", loginDTO.getEmail());
+
+        // 1. 로그인 ID/PW를 기반으로 AuthenticationToken 생성
+        UsernamePasswordAuthenticationToken authenticationToken = loginDTO.toAuthentication();
+
+        // 2. 실제로 검증 (사용자 비밀번호 체크) 이 이루어지는 부분
+        // authenticate 메서드가 실행이 될 때 CustomUserDetailService 에서 만들었던 loadUserByUsername 메서드 실행
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        log.info("사용자 인증 완료: 사용자 아이디={}", authentication.getName());
+
+        // 3. 인증 정보를 기반으로 JWT 토큰 생성
+        TokenDTO tokenDTO = tokenProvider.generateTokenDto(authentication);
+        log.info("JWT 토큰 생성 완료");
+
+        // 4. RefreshToken 저장
+        RefreshToken refreshToken = RefreshToken.builder()
+                .email(loginDTO.getEmail())
+                .key(authentication.getName())
+                .value(tokenDTO.getRefreshToken())
+                .build();
+        refreshTokenRepository.save(refreshToken);
+        log.info("RefreshToken 저장 완료: 사용자 아이디={}", authentication.getName());
+
+        // 5. 토큰 발급
+        log.info("로그인 완료: 사용자 아이디={}", authentication.getName());
+        return tokenDTO;
+    }
+
+    @Transactional
+    public LogoutDTO logout(LogoutDTO logoutDTO) {
+        log.info("로그아웃을 시도합니다...");
+
+        String logoutEmail = logoutDTO.getEmail();
+
+        Optional<RefreshToken> findRefreshToeken = refreshTokenRepository.findByEmail(logoutEmail);
+
+        // RefreshToken이 존재하면 삭제
+        findRefreshToeken.ifPresent(refreshToken -> {
+            refreshTokenRepository.delete(refreshToken);
+            log.info("RefreshToken 삭제 완료: 사용자 이메일={}", logoutEmail);
+        });
+
+        log.info("로그아웃이 완료되었습니다.");
+
+
+
+        return logoutDTO;
+    }
+
+
+    // 인증번호 전송
     @Transactional
     public EmailResponseDTO sendCertificationMail(EmailRequestDTO emailRequestDTO) {
 
@@ -76,36 +168,7 @@ public class AuthService {
         return EmailResponseDTO.of(saveEmail);
 
     }
-
-
-    @Transactional
-    public TokenDTO login(MemberRequestDTO memberRequestDTO) {
-        log.info("로그인 시도: 사용자 아이디={}", memberRequestDTO.getEmail());
-
-        // 1. 로그인 ID/PW를 기반으로 AuthenticationToken 생성
-        UsernamePasswordAuthenticationToken authenticationToken = memberRequestDTO.toAuthentication();
-
-        // 2. 실제로 검증 (사용자 비밀번호 체크) 이 이루어지는 부분
-        // authenticate 메서드가 실행이 될 때 CustomUserDetailService 에서 만들었던 loadUserByUsername 메서드 실행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        log.info("사용자 인증 완료: 사용자 아이디={}", authentication.getName());
-
-        // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        TokenDTO tokenDTO = tokenProvider.generateTokenDto(authentication);
-        log.info("JWT 토큰 생성 완료");
-
-        // 4. RefreshToken 저장
-        RefreshToken refreshToken = RefreshToken.builder()
-                .key(authentication.getName())
-                .value(tokenDTO.getRefreshToken())
-                .build();
-        refreshTokenRepository.save(refreshToken);
-        log.info("RefreshToken 저장 완료: 사용자 아이디={}", authentication.getName());
-
-        // 5. 토큰 발급
-        log.info("로그인 완료: 사용자 아이디={}", authentication.getName());
-        return tokenDTO;
-    }
+    // 로그아웃
 
 
     // 새로운 AccessToken 과 RefreshToken 발급

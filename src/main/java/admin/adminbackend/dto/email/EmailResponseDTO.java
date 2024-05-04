@@ -1,8 +1,7 @@
-package admin.adminbackend.dto;
+package admin.adminbackend.dto.email;
 
 
 import admin.adminbackend.domain.EmailCertification;
-import admin.adminbackend.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

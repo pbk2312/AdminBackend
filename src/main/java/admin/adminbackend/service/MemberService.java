@@ -1,7 +1,7 @@
 package admin.adminbackend.service;
 
 
-import admin.adminbackend.dto.MemberResponseDTO;
+import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
