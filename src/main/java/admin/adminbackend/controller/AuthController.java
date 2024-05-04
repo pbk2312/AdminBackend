@@ -57,5 +57,9 @@ public class AuthController {
         return ResponseEntity.ok(authService.withdrawalMembership(loginDTO));
     }
 
+    @PostMapping("/sendPasswordResetEmail")
+    public ResponseEntity<EmailResponseDTO> sendPasswordResetEmail(@RequestBody EmailRequestDTO emailRequestDTO) {
+        return ResponseEntity.ok(authService.sendPasswordResetEmail(emailRequestDTO));
+    }
 
 }

@@ -17,5 +17,8 @@ public class EmailResponseDTO {
         return new EmailResponseDTO(emailCertification.getCertificationEmail());
     }
 
+    public static EmailResponseDTO change(EmailRequestDTO emailRequestDTO) {
+        return new EmailResponseDTO(emailRequestDTO.getEmail());
+    }
 
 }

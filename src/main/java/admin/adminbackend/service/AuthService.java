@@ -65,13 +65,16 @@ public class AuthService {
         Member member = memberRequestDTO.toMember(passwordEncoder);
         Member savedMember = memberRepository.save(member);
 
+
+        emailRepository.delete(emailCertification);
+
         return MemberResponseDTO.of(savedMember);
     }
 
 
     // 탈퇴하기
     @Transactional
-    public MemberResponseDTO withdrawalMembership(LoginDTO loginDTO){
+    public MemberResponseDTO withdrawalMembership(LoginDTO loginDTO) {
         String withdrawalMembershipEmail = loginDTO.getEmail();
         String withdrawalMembershipPassword = loginDTO.getPassword();
 
@@ -94,8 +97,6 @@ public class AuthService {
 
         return MemberResponseDTO.of(member);
     }
-
-
 
 
     // 로그인 시도
@@ -146,12 +147,34 @@ public class AuthService {
         log.info("로그아웃이 완료되었습니다.");
 
 
-
         return logoutDTO;
     }
 
 
-    // 인증번호 전송
+    // 비밀번호 찾기
+
+    public EmailResponseDTO sendPasswordResetEmail(EmailRequestDTO emailRequestDTO) {
+
+
+        // 해당 이메일로 회원을 찾습니다.
+        Member member = memberRepository.findByEmail(emailRequestDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+
+        // 임시 비밀번호 생성
+        String resetToken = generateResetToken();
+        // 비밀번호 재설정 링크
+        String resetLink = "http://localhost:8080/member/updatePassword?token=" + resetToken;
+
+        // 이메일 보내기
+        boolean emailSent = emailProvider.sendPasswordResetEmail(emailRequestDTO, resetLink);
+        if (!emailSent) {
+            throw new RuntimeException("이메일 발송에 실패했습니다.");
+        }
+
+        return EmailResponseDTO.change(emailRequestDTO);
+    }
+
     @Transactional
     public EmailResponseDTO sendCertificationMail(EmailRequestDTO emailRequestDTO) {
 
@@ -168,10 +191,9 @@ public class AuthService {
         return EmailResponseDTO.of(saveEmail);
 
     }
-    // 로그아웃
-
 
     // 새로운 AccessToken 과 RefreshToken 발급
+
     @Transactional
     public TokenDTO reissuance(TokenRequestDTO tokenRequestDTO) {
 
@@ -203,8 +225,8 @@ public class AuthService {
 
     }
 
-
     // 난수 생성 메서드
+
     private String generateCertificationNumber() {
         int length = 6; // 인증번호 길이
         StringBuilder sb = new StringBuilder();
@@ -216,5 +238,17 @@ public class AuthService {
         return sb.toString();
     }
 
+    // 인증번호 전송
+    // 임시 비밀번호 생성 메서드
+    private String generateResetToken() {
+        int length = 20; // 임시 비밀번호 길이
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            char randomChar = (char) (random.nextInt(26) + 'a'); // 알파벳 소문자 랜덤 생성
+            sb.append(randomChar);
+        }
+        return sb.toString();
+    }
 
 }
