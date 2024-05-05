@@ -4,6 +4,7 @@ package admin.adminbackend.service;
 import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.RefreshToken;
+import admin.adminbackend.domain.ResetToken;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
 import admin.adminbackend.dto.login.LoginDTO;
@@ -18,6 +19,7 @@ import admin.adminbackend.repository.EmailRepository;
 import admin.adminbackend.repository.MemberRepository;
 import admin.adminbackend.repository.RefreshTokenRepository;
 import admin.adminbackend.jwt.TokenProvider;
+import admin.adminbackend.repository.ResetTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,6 +46,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final EmailProvider emailProvider;
     private final EmailRepository emailRepository;
+    private final ResetTokenRepository resetTokenRepository;
 
     // 회원가입
 
@@ -174,18 +177,22 @@ public class AuthService {
     }
 
 
+
     // 비밀번호 찾기
     public EmailResponseDTO sendPasswordResetEmail(EmailRequestDTO emailRequestDTO) {
-
 
         // 해당 이메일로 회원을 찾습니다.
         Member member = memberRepository.findByEmail(emailRequestDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
 
-
         // 임시 비밀번호 생성
         String resetToken = generateResetToken();
 
+        // ResetToken 엔티티 생성 및 저장
+        ResetToken tokenEntity = new ResetToken();
+        tokenEntity.setEmail(emailRequestDTO.getEmail());
+        tokenEntity.setResetToken(resetToken);
+        resetTokenRepository.save(tokenEntity);
 
         // 비밀번호 재설정 링크
         String resetLink = "http://localhost:8080/member/updatePassword?token=" + resetToken + "&email=" + emailRequestDTO.getEmail();
