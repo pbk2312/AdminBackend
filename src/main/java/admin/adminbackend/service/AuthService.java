@@ -8,6 +8,7 @@ import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
 import admin.adminbackend.dto.login.LoginDTO;
 import admin.adminbackend.dto.login.LogoutDTO;
+import admin.adminbackend.dto.register.MemberChangePasswordDTO;
 import admin.adminbackend.dto.register.MemberRequestDTO;
 import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
@@ -26,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
 
@@ -130,6 +132,8 @@ public class AuthService {
         return tokenDTO;
     }
 
+
+    // 로그아웃
     @Transactional
     public LogoutDTO logout(LogoutDTO logoutDTO) {
         log.info("로그아웃을 시도합니다...");
@@ -150,9 +154,27 @@ public class AuthService {
         return logoutDTO;
     }
 
+    // 비밀번호 재설정
+    @Transactional
+    public String memberChangePassword(MemberChangePasswordDTO memberChangePasswordDTO) {
+        String email = memberChangePasswordDTO.getEmail();
+        String password = memberChangePasswordDTO.getPassword();
+        String checkPassword = memberChangePasswordDTO.getCheckPassword();
+
+        if (!password.equals(checkPassword)) {
+            throw new RuntimeException("입력한 비밀번호가 일치하지 않습니다.");
+        }
+
+        //비밀번호 암호화
+        String hashedPassword = passwordEncoder.encode(password);
+
+        memberRepository.updatePasswordByEmail(email, hashedPassword);
+
+        return "비밀번호 변경이 완료되었습니다.";
+    }
+
 
     // 비밀번호 찾기
-
     public EmailResponseDTO sendPasswordResetEmail(EmailRequestDTO emailRequestDTO) {
 
 
@@ -163,8 +185,10 @@ public class AuthService {
 
         // 임시 비밀번호 생성
         String resetToken = generateResetToken();
+
+
         // 비밀번호 재설정 링크
-        String resetLink = "http://localhost:8080/member/updatePassword?token=" + resetToken;
+        String resetLink = "http://localhost:8080/member/updatePassword?token=" + resetToken + "&email=" + emailRequestDTO.getEmail();
 
         // 이메일 보내기
         boolean emailSent = emailProvider.sendPasswordResetEmail(emailRequestDTO, resetLink);
@@ -174,6 +198,7 @@ public class AuthService {
 
         return EmailResponseDTO.change(emailRequestDTO);
     }
+
 
     @Transactional
     public EmailResponseDTO sendCertificationMail(EmailRequestDTO emailRequestDTO) {
@@ -238,7 +263,6 @@ public class AuthService {
         return sb.toString();
     }
 
-    // 인증번호 전송
     // 임시 비밀번호 생성 메서드
     private String generateResetToken() {
         int length = 20; // 임시 비밀번호 길이

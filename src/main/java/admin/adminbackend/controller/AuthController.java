@@ -5,11 +5,13 @@ import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
 import admin.adminbackend.dto.login.LoginDTO;
 import admin.adminbackend.dto.login.LogoutDTO;
+import admin.adminbackend.dto.register.MemberChangePasswordDTO;
 import admin.adminbackend.dto.register.MemberRequestDTO;
 import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
 import admin.adminbackend.dto.token.TokenRequestDTO;
 import admin.adminbackend.service.AuthService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -61,5 +63,17 @@ public class AuthController {
     public ResponseEntity<EmailResponseDTO> sendPasswordResetEmail(@RequestBody EmailRequestDTO emailRequestDTO) {
         return ResponseEntity.ok(authService.sendPasswordResetEmail(emailRequestDTO));
     }
+
+    @PostMapping("/updatePassword")
+    public ResponseEntity<String> changePassword(@RequestParam("email") String email, @RequestBody MemberChangePasswordDTO memberChangePasswordDTO) {
+        memberChangePasswordDTO.setEmail(email);
+        String message = authService.memberChangePassword(memberChangePasswordDTO);
+        return ResponseEntity.ok(message);
+    }
+
+
+
+
+
 
 }
