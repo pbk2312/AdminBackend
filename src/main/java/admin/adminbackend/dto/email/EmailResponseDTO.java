@@ -1,8 +1,7 @@
-package admin.adminbackend.dto;
+package admin.adminbackend.dto.email;
 
 
 import admin.adminbackend.domain.EmailCertification;
-import admin.adminbackend.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,5 +17,8 @@ public class EmailResponseDTO {
         return new EmailResponseDTO(emailCertification.getCertificationEmail());
     }
 
+    public static EmailResponseDTO change(EmailRequestDTO emailRequestDTO) {
+        return new EmailResponseDTO(emailRequestDTO.getEmail());
+    }
 
 }

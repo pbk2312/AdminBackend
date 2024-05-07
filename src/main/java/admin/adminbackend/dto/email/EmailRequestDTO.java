@@ -1,4 +1,4 @@
-package admin.adminbackend.dto;
+package admin.adminbackend.dto.email;
 
 
 import admin.adminbackend.domain.EmailCertification;

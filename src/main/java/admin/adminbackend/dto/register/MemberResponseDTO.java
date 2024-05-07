@@ -1,4 +1,4 @@
-package admin.adminbackend.dto;
+package admin.adminbackend.dto.register;
 
 import admin.adminbackend.domain.Member;
 import lombok.AllArgsConstructor;

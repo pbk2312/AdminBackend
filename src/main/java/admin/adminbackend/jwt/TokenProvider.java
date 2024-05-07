@@ -1,6 +1,6 @@
 package admin.adminbackend.jwt;
 
-import admin.adminbackend.dto.TokenDTO;
+import admin.adminbackend.dto.token.TokenDTO;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
