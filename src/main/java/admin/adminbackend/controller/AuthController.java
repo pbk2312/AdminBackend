@@ -1,7 +1,5 @@
 package admin.adminbackend.controller;
-////
 
-import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.ResetToken;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
@@ -21,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @RestController
 @Slf4j
