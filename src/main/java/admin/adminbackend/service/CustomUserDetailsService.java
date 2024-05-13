@@ -18,25 +18,22 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-
     private final MemberRepository memberRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return memberRepository.findByEmail(username)
                 .map(this::createUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException(username + "-> DB에서 찾을 수 없다"));
-
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
     }
 
-    // DB 에 User 값이 존재한다면 UserDetails 객체로 만들어서 리턴
     private UserDetails createUserDetails(Member member) {
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getMemberRole().toString());
 
         return new User(
-                String.valueOf(member.getId()),
+                member.getEmail(), // ID로 사용자의 이메일을 사용합니다.
                 member.getPassword(),
-                Collections.singleton(grantedAuthority)
+                Collections.singletonList(grantedAuthority) // 단일 권한을 포함하는 리스트로 변경합니다.
         );
     }
 }

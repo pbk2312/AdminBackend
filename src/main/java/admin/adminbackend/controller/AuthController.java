@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
-    private final MemberRepository memberRepository;
     private final ResetTokenRepository resetTokenRepository;
 
     @PostMapping("/register")

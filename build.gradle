@@ -55,7 +55,9 @@ dependencies {
 
     // 아임포트
     implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
+    implementation 'com.google.guava:guava:30.1-jre' // 최신 버전 확인하여 업데이트 가능
 
 }
 
