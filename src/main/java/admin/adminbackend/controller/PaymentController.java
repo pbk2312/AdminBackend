@@ -59,15 +59,15 @@ public class PaymentController {
          */
         @PutMapping("/{orderId}")
         public ResponseEntity<?> verifyPayment(
-                @AuthenticationPrincipal Authentication authentication,
+                @AuthenticationPrincipal UserDetails userDetails,
                 @PathVariable Long orderId,
                 @Valid @RequestBody String receiptId
         ) {
             log.info("결제 확인 처리...");
             try {
-                Long memberId = Long.valueOf(authentication.getName());
+                Long memberId = Long.valueOf(userDetails.getUsername());
                 Member buyer = memberRepository.findById(memberId)
-                        .orElseThrow(() -> new RuntimeException("Could not find user for " + authentication.getName()));
+                        .orElseThrow(() -> new RuntimeException("Could not find user for " + userDetails.getUsername()));
                 Payment payment = paymentService.verifyPayment(receiptId, orderId.toString(), buyer);
                 return ResponseEntity.ok(payment);
             } catch (NumberFormatException e) {
