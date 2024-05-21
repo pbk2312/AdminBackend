@@ -2,7 +2,7 @@ package admin.adminbackend.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.stereotype.Service;
+
 
 @Entity
 @Getter
@@ -14,7 +14,7 @@ public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="member_id")
+    @Column(name = "member_id")
     private Long id;
 
     private String email;
@@ -30,9 +30,6 @@ public class Member {
         this.password = password;
         this.memberRole = memberRole;
     }
-
-
-
-
-
 }
+
+
