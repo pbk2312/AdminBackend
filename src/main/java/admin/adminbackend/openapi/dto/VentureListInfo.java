@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class VentureInfo {
+public class VentureListInfo {
     private String code; //신규_재확인코드
     private String mainProduct; //주생산품
     private String area; //지역
@@ -25,10 +25,10 @@ public class VentureInfo {
     private String owner; //대표자명
     private String startDate; //벤처유효시작일
 
-    public VentureInfo() {
+    public VentureListInfo() {
     }
 
-    public VentureInfo(String code, String mainProduct, String area,
+    public VentureListInfo(String code, String mainProduct, String area,
                        String address, String registInstitution, String endDate,
                        String registType, String typeName, String typeName_spc, String name,
                        Long id, String owner, String startDate) {
