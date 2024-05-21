@@ -51,6 +51,7 @@ public class SecurityConfig {
                 )
                 .authorizeRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/member/**").permitAll()
+                        .requestMatchers("/venture/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 // CORS 설정 추가
