@@ -1,7 +1,5 @@
 package admin.adminbackend.controller;
-////
 
-import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.ResetToken;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
