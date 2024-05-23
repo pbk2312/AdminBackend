@@ -1,40 +1,35 @@
 package admin.adminbackend.domain;
 
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.persistence.*;
 import lombok.*;
 
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class Member {
 
     @Id
-    @NotEmpty
-    private String name;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
+    private Long id;
 
-    @NotEmpty
-    private String password;
-
-    @NotEmpty
     private String email;
 
+    private String password;
+
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private MemberRole memberRole;
 
-    public void changePw(String password) {
-        this.password = password;
-    }
-
-    public void changeEmail(String email) {
+    @Builder
+    public Member(String email, String password, MemberRole memberRole) {
         this.email = email;
+        this.password = password;
+        this.memberRole = memberRole;
     }
 }
+
+

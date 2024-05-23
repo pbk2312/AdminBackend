@@ -1,53 +1,91 @@
 package admin.adminbackend.config;
 
+import admin.adminbackend.jwt.JwtAccessDeniedHandler;
+import admin.adminbackend.jwt.JwtAuthenticationEntryPoint;
+import admin.adminbackend.jwt.JwtSecurityConfig;
+import admin.adminbackend.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
-@Log4j2
-@EnableWebMvc // HTTP 요청을 처리하는데 사용
 @RequiredArgsConstructor
+@EnableWebSecurity
 public class SecurityConfig {
 
+    private final TokenProvider tokenProvider;
+    private final CorsFilter corsFilter;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    // 패스워드 인코더 설정
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        log.info("logIn Check....");
+        http
+                .csrf(csrf -> csrf.disable())
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
+                )
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions.sameOrigin())
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/mypage/**").authenticated()
+                        .requestMatchers("/member/**").permitAll()
+                        .requestMatchers("/venture/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                // CORS 설정 추가
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-        http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable());// CSRF 토큰 비활성화
-
-        http.formLogin(form-> form.loginPage("/login")); // 사용자가 인증되지 않은 경우 "/login"으로 리다이렉트
-        http.sessionManagement(sesstionManagement -> sesstionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션을 사용하지 않음
-
+                // JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스를 적용
+                .with(new JwtSecurityConfig(tokenProvider), jwtSecurityConfig -> {
+                    // JwtSecurityConfig에 대한 커스터마이즈 작업을 수행합니다.
+                });
 
         return http.build();
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer(){
-
-        log.info("정적 리소스 처리 X");
-
-        return (web)-> web.ignoring()
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withJwkSetUri("https://example.com/.well-known/jwks.json").build();
     }
+
 
 
 }
