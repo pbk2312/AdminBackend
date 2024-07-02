@@ -3,6 +3,8 @@ package admin.adminbackend.openapi.controller;
 import admin.adminbackend.openapi.dto.VentureListInfo;
 import admin.adminbackend.openapi.service.VentureListInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +17,8 @@ import java.util.List;
         private VentureListInfoService ventureListInfoService;
 
         @GetMapping("/{name}")
-        public VentureListInfo getCompanyByName(@PathVariable String name) {
+        public VentureListInfo getCompanyByName(
+                @PathVariable String name) {
             return ventureListInfoService.getCompanyByName(name);
         }
 
@@ -25,12 +28,15 @@ import java.util.List;
         }
 
         @PostMapping("/add")
-        public VentureListInfo addCompany(@RequestBody VentureListInfo ventureListInfo) {
+        public VentureListInfo addCompany(
+                @RequestBody VentureListInfo ventureListInfo) {
             return ventureListInfoService.saveCompany(ventureListInfo);
         }
 
         @DeleteMapping("/{id}")
-        public void deleteCompany(@PathVariable Long id) {
+        public void deleteCompany(
+                @PathVariable Long id
+        ) {
             ventureListInfoService.deleteCompany(id);
         }
     }
