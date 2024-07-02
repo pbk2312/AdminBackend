@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
@@ -31,7 +32,8 @@ public class VentureListApiManager {
 
     @GetMapping("/list")
     @ResponseBody
-    public JSONArray callApi(@RequestParam("page") int page) {  //http://localhost:8080/api/ventureList?page=4 GET으로 요청!!
+    @Transactional
+    public JSONArray callApi(int page) {  //http://localhost:8080/api/ventureList?page=4 GET으로 요청!!
         JSONArray result = new JSONArray();
         try {
             String urlStr = "https://api.odcloud.kr/api/15084581/v1/uddi:fce46dc0-d056-4466-b2a3-c0222b0d6d3a?" +
@@ -84,13 +86,18 @@ public class VentureListApiManager {
                             registInstitution, endDate, registType, typeName, typeName_spc,
                             name, id, owner, startDate);
 
-                    // 데이터베이스에 저장합니다.
-                    ventureListInfoRepository.save(infoObj);
+                    // 데이터베이스에 이미 존재하는지 확인
+                    if (!ventureListInfoRepository.existsById(id)) {
+                        ventureListInfoRepository.save(infoObj);
+                    }
 
-                    // 결과 JSON에 추가합니다.
+                    /*// 데이터베이스에 저장
+                    ventureListInfoRepository.save(infoObj);*/
+
+                    // 결과 JSON에 추가
                     result.add(itemObject);
                 }else {
-                    // JSONObject가 아닌 경우에 대한 처리를 수행합니다.
+                    // JSONObject가 아닌 경우에 대한 처리를 수행
                     System.out.println("JSONObject 아님: " + item.toString());
                 }
             }
