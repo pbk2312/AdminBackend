@@ -1,8 +1,14 @@
 package admin.adminbackend.controller;
 
 
+import admin.adminbackend.dto.email.EmailRequestDTO;
+import admin.adminbackend.dto.email.EmailResponseDTO;
+import admin.adminbackend.dto.login.LoginDTO;
 import admin.adminbackend.dto.myPage.MyPageRequestDTO;
 import admin.adminbackend.dto.myPage.PasswordChangeDTO;
+import admin.adminbackend.dto.register.MemberChangePasswordDTO;
+import admin.adminbackend.dto.register.MemberResponseDTO;
+import admin.adminbackend.service.AuthService;
 import admin.adminbackend.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +27,7 @@ public class MyPageController {
 
 
     private final MyPageService myPageService;
+    private final AuthService authService;
 
 
     @PostMapping("/check")
@@ -51,5 +58,38 @@ public class MyPageController {
         String message = myPageService.changePassword(username, passwordChangeDTO.getChangePassword(), passwordChangeDTO.getChangeCheckPassword());
         return ResponseEntity.ok(message);
     }
+
+
+    @PostMapping("/withdrawalMembership")
+    public ResponseEntity<MemberResponseDTO> withdrawalMembership(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody LoginDTO loginDTO) {
+        loginDTO.setEmail(userDetails.getUsername());
+        return ResponseEntity.ok(authService.withdrawalMembership(loginDTO));
+    }
+
+    @PostMapping("/sendPasswordResetEmail")
+    public ResponseEntity<EmailResponseDTO> sendPasswordResetEmail(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        log.info("회원 탈퇴 이메일을 전송합니다...");
+        if (userDetails == null){
+            log.info("userDetails = Null");
+        }
+        log.info("회원 탈퇴를 진행하는 이메일 : {}" ,userDetails.getUsername());
+        EmailRequestDTO requestDTO = new EmailRequestDTO();
+        requestDTO.setEmail(userDetails.getUsername());
+        return ResponseEntity.ok(authService.sendPasswordResetEmail(requestDTO));
+    }
+
+    @PostMapping("/updatePassword")
+    public ResponseEntity<String> changePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody MemberChangePasswordDTO memberChangePasswordDTO) {
+        String email = userDetails.getUsername();
+        memberChangePasswordDTO.setEmail(email);
+        String message = authService.memberChangePassword(memberChangePasswordDTO);
+        return ResponseEntity.ok(message);
+    }
+
 
 }

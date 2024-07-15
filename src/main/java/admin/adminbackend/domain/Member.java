@@ -1,8 +1,8 @@
 package admin.adminbackend.domain;
 
+import admin.adminbackend.openapi.dto.VentureListInfo;
 import jakarta.persistence.*;
 import lombok.*;
-
 
 @Entity
 @Getter
@@ -18,18 +18,11 @@ public class Member {
     private Long id;
 
     private String email;
-
     private String password;
 
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
-    @Builder
-    public Member(String email, String password, MemberRole memberRole) {
-        this.email = email;
-        this.password = password;
-        this.memberRole = memberRole;
-    }
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private VentureListInfo ventureListInfo;
 }
-
-

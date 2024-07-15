@@ -15,6 +15,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
+
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer";
 
@@ -38,9 +39,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // 요청 헤더에서 토큰 정보 꺼내기
     private String tokenResolve(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(7);
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER); // 요청 헤더에서 "Authorization" 값을 가져옴
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) { // 헤더 값이 존재하고 "Beaer"로 존재하는지 확인
+            return bearerToken.substring(7); // "Bearer" 접두사 제거하고 JWT 문자열 반환
         }
         return null;
     }

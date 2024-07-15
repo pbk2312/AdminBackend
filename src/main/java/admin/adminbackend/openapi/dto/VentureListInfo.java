@@ -1,14 +1,17 @@
 package admin.adminbackend.openapi.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import admin.adminbackend.domain.Member;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
 public class VentureListInfo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; //연번
+
     private String code; //신규_재확인코드
     private String mainProduct; //주생산품
     private String area; //지역
@@ -19,19 +22,19 @@ public class VentureListInfo {
     private String typeName; //업종명_10차
     private String typeName_spc; //업종분류_기보
     private String name; //업체명
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; //연번
     private String owner; //대표자명
     private String startDate; //벤처유효시작일
 
-    public VentureListInfo() {
-    }
+    @OneToOne
+    @JoinColumn(name = "member_id", nullable = true)
+    private Member member;
+
+    public VentureListInfo() {}
 
     public VentureListInfo(String code, String mainProduct, String area,
-                       String address, String registInstitution, String endDate,
-                       String registType, String typeName, String typeName_spc, String name,
-                       Long id, String owner, String startDate) {
+                           String address, String registInstitution, String endDate,
+                           String registType, String typeName, String typeName_spc, String name,
+                           Long id, String owner, String startDate) {
         this.code = code;
         this.mainProduct = mainProduct;
         this.area = area;
