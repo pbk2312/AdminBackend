@@ -2,14 +2,15 @@ package admin.adminbackend.dto.register;
 
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.MemberRole;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+
 
 @Getter
 @AllArgsConstructor

@@ -1,8 +1,8 @@
 package admin.adminbackend.dto.myPage;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter

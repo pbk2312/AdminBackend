@@ -1,10 +1,10 @@
 package admin.adminbackend.dto.payment;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
 
 @AllArgsConstructor
 @Getter

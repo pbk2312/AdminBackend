@@ -1,6 +1,8 @@
 package admin.adminbackend.controller;
 
 
+import admin.adminbackend.domain.IRNotification;
+import admin.adminbackend.domain.Member;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
 import admin.adminbackend.dto.login.LoginDTO;
@@ -16,7 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -72,10 +77,10 @@ public class MyPageController {
     public ResponseEntity<EmailResponseDTO> sendPasswordResetEmail(
             @AuthenticationPrincipal UserDetails userDetails) {
         log.info("회원 탈퇴 이메일을 전송합니다...");
-        if (userDetails == null){
+        if (userDetails == null) {
             log.info("userDetails = Null");
         }
-        log.info("회원 탈퇴를 진행하는 이메일 : {}" ,userDetails.getUsername());
+        log.info("회원 탈퇴를 진행하는 이메일 : {}", userDetails.getUsername());
         EmailRequestDTO requestDTO = new EmailRequestDTO();
         requestDTO.setEmail(userDetails.getUsername());
         return ResponseEntity.ok(authService.sendPasswordResetEmail(requestDTO));
@@ -92,4 +97,46 @@ public class MyPageController {
     }
 
 
+    @GetMapping("/memberInfo")
+    public ResponseEntity<Member> memberInfo(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Member member = myPageService.getMemberInfo(userDetails.getUsername());
+        log.info("조회 멤버....{}", member);
+        return ResponseEntity.ok(member);
+    }
+
+
+    @GetMapping("/IRCheck")
+    public ResponseEntity<List<IRNotification>> IRCheck(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        // 사용자 정보를 기반으로 멤버 객체 조회
+        Member member = myPageService.getMemberInfo(userDetails.getUsername());
+        log.info("IR 조회 멤버: {}", member);
+
+        // 멤버를 기반으로 IRNotification 리스트 조회
+        List<IRNotification> irList = myPageService.findIRList(member);
+
+        // 리스트가 비어 있는 경우, 적절한 상태 코드와 메시지를 반환할 수 있습니다.
+        if (irList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        // 리스트가 비어 있지 않은 경우, 200 OK와 함께 리스트를 반환
+        return ResponseEntity.ok(irList);
+    }
+
+    @PostMapping("/IRSend")
+    public ResponseEntity<String> IRSend(@AuthenticationPrincipal UserDetails userDetails,
+                                         @RequestParam("memberEmail") String email
+    ) {
+
+        // 사용자 정보를 기반으로 멤버 객체 조회
+        Member member = myPageService.getMemberInfo(userDetails.getUsername());
+        log.info("IR 전송 멤버: {}", member);
+
+
+        return ResponseEntity.ok("미완성");
+    }
 }
