@@ -9,4 +9,6 @@ import java.util.List;
 public interface IRNotificationRepository extends JpaRepository<IRNotification, Long> {
 
     List<IRNotification> findByMemberAndIsReadFalse(Member member);
+
+
 }

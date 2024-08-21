@@ -105,12 +105,12 @@ public class MyPageService {
     }
 
     @Transactional
-    public boolean IRSend(Member member, Member shipper) {
+    public boolean IRSend(Member member, Member person) {
         try {
             // IRNotification 생성 및 저장 로직
             IRNotification notification = new IRNotification();
             notification.setMember(member);
-            notification.setShipper(shipper);
+            notification.setPerson(person);
             notification.setRead(false); // 기본적으로 읽지 않은 상태로 설정
             // Save notification to the repository
             irNotificationRepository.save(notification);
@@ -128,5 +128,10 @@ public class MyPageService {
         return byMemberAndIsReadFalse;
     }
 
+    @Transactional
+    public IRNotification findIRSendMember(Long IRNotificationId){
+        IRNotification irNotification = irNotificationRepository.findById(IRNotificationId).orElseThrow(() -> new RuntimeException("IR이 없다"));
+        return irNotification;
+    }
 
 }

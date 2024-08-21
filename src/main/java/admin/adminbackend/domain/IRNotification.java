@@ -26,5 +26,5 @@ public class IRNotification {
 
         @ManyToOne
         @JoinColumn(name = "shipper_id")
-        private Member shipper; // 발송인
+        private Member person; // 발송인
 }

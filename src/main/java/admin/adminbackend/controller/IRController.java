@@ -26,6 +26,8 @@ public class IRController {
     private final MyPageService myPageService;
 
 
+
+    // IR 보내기
     @PostMapping("info")
     public ResponseEntity<String> sendIR(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -50,8 +52,6 @@ public class IRController {
             return ResponseEntity.status(500).body("IR 요청 실패");
         }
     }
-
-
 
 
 }
