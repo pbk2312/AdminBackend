@@ -8,8 +8,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class TestController {
 
 
-    @GetMapping("/test")
+    @GetMapping("/testForm")
     public String test() {
         return "test";
+    }
+
+    @GetMapping("/IRCheckTest")
+    public String IRCheckTest() {
+        return "IRCheckTest";
     }
 }

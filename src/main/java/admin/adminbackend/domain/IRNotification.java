@@ -1,5 +1,6 @@
 package admin.adminbackend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,8 @@ public class IRNotification {
 
         @ManyToOne
         @JoinColumn(name = "member_id")
-        private Member member; // 수령인
+        @JsonIgnore  // 순환 참조 방지
+        private Member venture; // 수령인
 
         private boolean isRead;
 
@@ -26,5 +28,6 @@ public class IRNotification {
 
         @ManyToOne
         @JoinColumn(name = "shipper_id")
+        @JsonIgnore  // 순환 참조 방지
         private Member person; // 발송인
 }

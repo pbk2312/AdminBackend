@@ -6,6 +6,7 @@ import admin.adminbackend.domain.Member;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
 import admin.adminbackend.dto.login.LoginDTO;
+import admin.adminbackend.dto.myPage.IRNotificationDTO;
 import admin.adminbackend.dto.myPage.MyPageRequestDTO;
 import admin.adminbackend.dto.myPage.PasswordChangeDTO;
 import admin.adminbackend.dto.register.MemberChangePasswordDTO;
@@ -30,7 +31,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -117,27 +120,34 @@ public class MyPageController {
     }
 
 
-    // IR 온거 기업이 확인
+
+
     @GetMapping("/IRCheck")
-    public ResponseEntity<List<IRNotification>> IRCheck(
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
-        // 사용자 정보를 기반으로 멤버 객체 조회
-        Member venture = myPageService.getMemberInfo(userDetails.getUsername());
-        log.info("IR 조회 멤버: {}", venture);
+    public ResponseEntity<?> IRCheck(@AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            // 사용자 정보를 기반으로 멤버 객체 조회
+            Member venture = myPageService.getMemberInfo(userDetails.getUsername());
+            log.info("IR 조회 요청을 받은 멤버: {}", venture);
 
-        // 멤버를 기반으로 IRNotification 리스트 조회
-        List<IRNotification> irList = myPageService.findIRList(venture);
+            // 멤버를 기반으로 IRNotification 리스트 조회 및 DTO로 변환
+            List<IRNotificationDTO> irNotificationDTOList = myPageService.findIRList(venture);
 
-        // 리스트가 비어 있는 경우, 적절한 상태 코드와 메시지를 반환할 수 있습니다.
-        if (irList.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            // IR 리스트가 비어 있는 경우, 200 OK와 함께 빈 리스트를 반환
+            if (irNotificationDTOList.isEmpty()) {
+                log.info("멤버 {}의 IR 리스트가 비어 있습니다.", venture);
+                return ResponseEntity.ok(Collections.emptyList()); // 빈 리스트 반환
+            }
+
+            // IR 리스트가 비어 있지 않은 경우, 200 OK와 함께 리스트를 반환
+            log.info("멤버 {}의 IR 리스트를 반환합니다. 총 {} 건", venture, irNotificationDTOList.size());
+            return ResponseEntity.ok(irNotificationDTOList);
+        } catch (Exception e) {
+            // 예외 처리
+            log.error("IR 조회 중 오류 발생: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("IR 알림 조회 중 오류가 발생했습니다.");
         }
-
-        // 리스트가 비어 있지 않은 경우, 200 OK와 함께 리스트를 반환
-        return ResponseEntity.ok(irList);
     }
-
 
     @PostMapping("/sendIR")
     public ResponseEntity<String> sendIR(@AuthenticationPrincipal UserDetails userDetails,
@@ -151,9 +161,13 @@ public class MyPageController {
         IRNotification irNotification = myPageService.findIRSendMember(IRId);
         Member getPerson = irNotification.getPerson();
 
+        // IR 읽기 URL 생성
+        String readUrl = "http://localhost:8080/mypage/readIR?IRId=" + IRId;
+
         // 이메일 제목과 본문 구성
         String subject = "[스타트업 투자 플랫폼] IR 자료";
-        String body = "안녕하세요,\n\n첨부된 파일을 확인해 주세요.\n\n감사합니다.";
+        String body = "안녕하세요,\n\n첨부된 파일을 확인해 주세요.\n" +
+                "IR 자료를 읽으시면 다음 링크를 클릭하여 자금투자계약서를 작성해주세요: " + readUrl + "\n\n감사합니다.";
 
         // 이메일 전송
         boolean result = emailProvider.sendFileEmail(getPerson.getEmail(), subject, body, file);
@@ -164,4 +178,21 @@ public class MyPageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패");
         }
     }
+
+    @GetMapping("/readIR")
+    public ResponseEntity<String> readIR(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("IRId") Long IRId) {
+        IRNotification irNotification = myPageService.findIRSendMember(IRId);
+
+        if (irNotification != null) {
+            irNotification.setRead(true);
+            myPageService.saveIRNotification(irNotification);  // 업데이트된 상태 저장
+            return ResponseEntity.ok("IR 자료를 읽었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("IR 자료를 찾을 수 없습니다.");
+        }
+    }
+
+
 }

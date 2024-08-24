@@ -4,6 +4,8 @@ import admin.adminbackend.openapi.dto.VentureListInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -25,4 +27,7 @@ public class Member {
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private VentureListInfo ventureListInfo;
+
+    @OneToMany(mappedBy = "investor")
+    private List<Investment> investments; // 투자 내역
 }

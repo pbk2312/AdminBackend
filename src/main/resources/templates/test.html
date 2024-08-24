@@ -3,23 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IR 파일 전송</title>
+  <title>IR Notification Test</title>
 </head>
 <body>
-<h1>IR 파일 전송</h1>
-<form method="POST" enctype="multipart/form-data" action="/mypage/sendIR">
-  <!-- IR ID 입력 필드 -->
-  <label for="IRId">IR ID:</label>
-  <input type="number" id="IRId" name="IRId" required>
-  <br><br>
+<h1>IR Notification Test</h1>
 
-  <!-- 파일 첨부 필드 -->
-  <label for="file">첨부파일:</label>
-  <input type="file" id="file" name="file" required>
-  <br><br>
-
-  <!-- 제출 버튼 -->
-  <button type="submit">파일 전송</button>
+<form id="irForm">
+  <label for="ventureName">Venture Name:</label>
+  <input type="text" id="ventureName" name="ventureName" required>
+  <label for="accessToken">Access Token:</label>
+  <input type="text" id="accessToken" name="accessToken" required>
+  <button type="submit">Send IR</button>
 </form>
+
+<p id="responseMessage"></p>
+
+<script>
+  document.getElementById('irForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const ventureName = document.getElementById('ventureName').value;
+    const accessToken = document.getElementById('accessToken').value;
+    const responseMessage = document.getElementById('responseMessage');
+
+    try {
+      const response = await fetch('http://localhost:8080/venture/info', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Bearer ${accessToken}`  // 액세스 토큰을 헤더에 추가
+        },
+        body: new URLSearchParams({ ventureName: ventureName })
+      });
+
+      if (response.ok) {
+        const message = await response.text();
+        responseMessage.textContent = message;
+      } else {
+        responseMessage.textContent = 'IR 요청 실패';
+      }
+    } catch (error) {
+      responseMessage.textContent = 'IR 요청 실패';
+      console.error('Error:', error);
+    }
+  });
+</script>
 </body>
 </html>

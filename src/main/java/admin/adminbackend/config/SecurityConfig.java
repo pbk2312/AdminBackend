@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/mypage/readIR").permitAll()
                         .requestMatchers("/mypage/**").authenticated()
                         .requestMatchers("/member/**").permitAll()
                         .requestMatchers("/venture/**").permitAll()

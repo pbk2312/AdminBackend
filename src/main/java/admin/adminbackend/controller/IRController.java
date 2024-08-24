@@ -28,7 +28,7 @@ public class IRController {
 
 
     // IR 보내기
-    @PostMapping("info")
+    @PostMapping("/info")
     public ResponseEntity<String> sendIR(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("ventureName") String ventureName
