@@ -17,4 +17,10 @@ public class TestController {
     public String IRCheckTest() {
         return "IRCheckTest";
     }
+
+
+    @GetMapping("/paymentTest")
+    public String paymentTest(){
+        return "paymentTest";
+    }
 }

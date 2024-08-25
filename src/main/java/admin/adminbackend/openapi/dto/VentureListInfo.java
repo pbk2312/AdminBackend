@@ -1,8 +1,11 @@
 package admin.adminbackend.openapi.dto;
 
+import admin.adminbackend.domain.Investment;
 import admin.adminbackend.domain.Member;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -28,6 +31,11 @@ public class VentureListInfo {
     @OneToOne
     @JoinColumn(name = "member_id", nullable = true)
     private Member member;
+
+
+    @OneToMany(mappedBy = "ventureListInfo")
+    private List<Investment> investments; // List to hold investments related to this VentureListInfo
+
 
     public VentureListInfo() {}
 

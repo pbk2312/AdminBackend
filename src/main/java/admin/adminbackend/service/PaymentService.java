@@ -11,7 +11,7 @@ import com.siot.IamportRestClient.response.Payment;
 public interface PaymentService {
 
     // 결제 요청 데이터 조회
-    PaymentDTO findRequestDto(String reservationUid);
+    PaymentDTO findRequestDto(String investmentUid);
 
     // 결제(콜백)
     IamportResponse<Payment> paymentByCallback(PaymentCallbackRequest request);
