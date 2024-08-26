@@ -39,6 +39,8 @@ dependencies {
     //추가 0501
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
 
+    //implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2' // 최신 버전으로 변경
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
@@ -66,6 +68,13 @@ dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
     implementation 'com.google.guava:guava:30.1-jre' // 최신 버전 확인하여 업데이트 가능
+
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'org.apache.pdfbox:pdfbox:2.0.29'
+
 
 }
 

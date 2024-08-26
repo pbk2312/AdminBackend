@@ -10,7 +10,6 @@ import admin.adminbackend.dto.register.MemberRequestDTO;
 import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
 import admin.adminbackend.dto.token.TokenRequestDTO;
-import admin.adminbackend.repository.MemberRepository;
 import admin.adminbackend.repository.ResetTokenRepository;
 import admin.adminbackend.service.AuthService;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package admin.adminbackend.openapi.UtilService;
+package admin.adminbackend.openapi.service.UtilService;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

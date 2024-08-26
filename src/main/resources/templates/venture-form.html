@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+<div class="container">
+    <div class="py-5 text-center">
+        <h2>기업 등록 화면</h2>
+    </div>
+    <form th:action method="post" enctype="multipart/form-data">
+        <ul>
+            <li>기업명 <input type="text" name="name"></li>
+            <li>대표자명 <input type="text" name="owner"></li>
+            <li>사업자 등록 번호 <input type="text" name="ventureNumber"><button type="submit">인증</button></li>
+            <li>주생산품 <input type="text" name="mainProduct"></li>
+            <li>업종명 <input type="text" name="typeName"></li>
+            <li>사업자 등록 증명원(첨부파일)<input type="file" name="attachFile" ></li>
+        </ul>
+        <input type="submit"/>
+    </form>
+</div> <!-- /container -->
+</body>
+</html>

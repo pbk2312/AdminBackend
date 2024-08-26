@@ -1,7 +1,7 @@
-package admin.adminbackend.openapi.UtilService;
+package admin.adminbackend.openapi.service.UtilService;
 
-import admin.adminbackend.openapi.dto.VentureListInfoRepository;
-import admin.adminbackend.openapi.service.VentureListApiManager;
+import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
+import admin.adminbackend.openapi.service.VentureListService;
 import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
@@ -19,7 +19,7 @@ public class StartupRunner {
     private VentureListInfoRepository ventureListInfoRepository;
 
     @Autowired
-    private VentureListApiManager ventureListApiManager;
+    private VentureListService ventureListService;
 
     @Bean
     public ApplicationRunner initializeData() {
@@ -28,7 +28,7 @@ public class StartupRunner {
             if (count == 0) {
                 int totalPages = 10;  // 예를 들어 40548개의 데이터를 페이지당 5000개씩 나눈 경우
                 for (int page = 1; page <= totalPages; page++) {
-                    JSONArray response = ventureListApiManager.callApi(page);
+                    JSONArray response = ventureListService.callApi(page);
                     // 로그 또는 진행 상황을 출력
                     System.out.println("Page " + page + " processed.");
                 }
