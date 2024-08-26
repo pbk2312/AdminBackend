@@ -44,18 +44,7 @@
     .info p strong {
       flex-basis: 40%;
     }
-    .highlight {
-      color: #007bff;
-      font-weight: 500;
-    }
-    .price {
-      display: flex;
-      align-items: baseline;
-    }
-    .price .amount {
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
+
     .btn-primary {
       width: 100%;
       padding: 15px;
@@ -69,28 +58,28 @@
       background-color: #0056b3;
       transform: translateY(-2px);
     }
-
   </style>
   <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
   <script>
     var IMP = window.IMP;
-    IMP.init("imp85582277");
+    IMP.init("imp78441747");
 
     function requestPay() {
-      var reservationUid = '[[${requestDto.reservationUid}]]';
-      var roomId = '[[${requestDto.roomId}]]';
+      var investmentUid = '[[${requestDto.investmentUid}]]';
       var totalPrice = [[${requestDto.totalPrice}]];
-      var buyerName = '[[${requestDto.buyerName}]]';
-      var phoneNumber = '[[${requestDto.phoneNumber}]]';
-      var addr = '[[${requestDto.addr}]]';
-      var email = '[[${requestDto.email}]]';
+      var email = '[[${requestDto.memberEmail}]]';
+      var name = '[[${requestDto.ventureName}]]';
+
+      var buyerName = document.getElementById('buyerName').value;
+      var phoneNumber = document.getElementById('phoneNumber').value;
+      var addr = document.getElementById('addr').value;
 
       IMP.request_pay({
         pg: 'html5_inicis.INIpayTest',
         pay_method: 'card',
-        merchant_uid: reservationUid, // 주문 번호
-        name: roomId, // 상품 이름
+        merchant_uid: investmentUid, // 주문 번호
+        name: name, // 상품 이름
         amount: totalPrice, // 상품 가격
         buyer_email: email, // 구매자 이메일
         buyer_name: buyerName, // 구매자 이름
@@ -120,9 +109,6 @@
       });
     }
 
-
-
-
     // 페이지 로드 시 브라우저 히스토리 관리
     window.history.pushState({page: "paymentPage"}, "", window.location.href);
 
@@ -136,12 +122,24 @@
     <h1>결제 페이지</h1>
   </div>
   <div class="info">
+    <!-- 사용자 입력 폼 -->
+    <div class="mb-3">
+      <label for="buyerName" class="form-label">구매자 이름</label>
+      <input type="text" class="form-control" id="buyerName" placeholder="이름을 입력하세요" required>
+    </div>
+    <div class="mb-3">
+      <label for="phoneNumber" class="form-label">전화번호</label>
+      <input type="text" class="form-control" id="phoneNumber" placeholder="전화번호를 입력하세요" required>
+    </div>
+    <div class="mb-3">
+      <label for="addr" class="form-label">주소</label>
+      <input type="text" class="form-control" id="addr" placeholder="주소를 입력하세요" required>
+    </div>
   </div>
   <button class="btn btn-primary" onclick="requestPay()">
     결제하기
   </button>
 </div>
-
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -13,6 +13,7 @@ public interface InvestmentRepository extends JpaRepository<Investment,Long> {
             " left join fetch o.payment p" +
             " left join fetch o.investor m" +
             " where o.investmentUid = :investmentUid")
-    Optional<Investment> findInvestmentAndPaymentAndMember(@Param("reservationUid") String reservationUid);
+    Optional<Investment> findInvestmentAndPaymentAndMember(@Param("investmentUid") String investmentUid);
+
 
 }
