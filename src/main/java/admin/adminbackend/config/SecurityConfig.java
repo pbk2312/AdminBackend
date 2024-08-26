@@ -51,15 +51,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                /*.authorizeRequests(authorizeRequests -> authorizeRequests
+                .authorizeRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/mypage/**").authenticated()
                         .requestMatchers("/member/**").permitAll()
                         .requestMatchers("/venture/**").permitAll()
-                        .requestMatchers("/add-form/**").permitAll()
-                        .requestMatchers("/api/**").permitAll() //뭔지는 모르지만 윤서가 추가함...
-                        .requestMatchers("/ventures/**").permitAll() //얘도 추가함
                         .anyRequest().authenticated()
-                )*/
+                )
                 // CORS 설정 추가
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
