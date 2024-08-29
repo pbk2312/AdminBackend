@@ -95,7 +95,7 @@
             headers: {"Content-Type": "application/json"},
             data: JSON.stringify({
               "payment_uid": rsp.imp_uid,      // 결제 고유번호
-              "reservation_uid": rsp.merchant_uid   // 주문번호
+              "investment_uid": rsp.merchant_uid   // 주문번호
             })
           }).done(function (response) {
             console.log(response);

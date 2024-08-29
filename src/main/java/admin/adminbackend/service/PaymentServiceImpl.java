@@ -15,6 +15,7 @@ import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -42,6 +43,7 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
+    @Transactional
     public IamportResponse<Payment> paymentByCallback(PaymentCallbackRequest request) {
         try {
             log.info("결제 시도..");
@@ -78,6 +80,10 @@ public class PaymentServiceImpl implements PaymentService{
 
                 throw new RuntimeException("결제금액 위변조 의심");
             }
+
+
+            log.info("iamportResponse : {} "  , iamportResponse.getResponse().getImpUid());
+
 
             // 결제 상태 변경
             investment.getPayment().changePaymentBySuccess(PaymentStatus.COMPLETED, iamportResponse.getResponse().getImpUid());

@@ -3,6 +3,7 @@ package admin.adminbackend.service;
 import admin.adminbackend.domain.Investment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.Payment;
+import admin.adminbackend.domain.PaymentStatus;
 import admin.adminbackend.openapi.dto.VentureListInfo;
 import admin.adminbackend.openapi.dto.VentureListInfoRepository;
 import admin.adminbackend.repository.InvestmentRepository;
@@ -37,6 +38,10 @@ public class InvestmentService {
         VentureListInfo ventureListInfo = ventureListInfoRepository.findById(ventureId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid venture ID"));
 
+        // 결제 정보 저장
+        Payment payment = new Payment(amount, PaymentStatus.PENDING);
+        Payment paymentSave = paymentRepository.save(payment);// Payment 저장
+
         // Investment 엔티티 생성
         Investment investment = new Investment();
         investment.setInvestmentUid(UUID.randomUUID().toString());
@@ -44,6 +49,7 @@ public class InvestmentService {
         investment.setVentureListInfo(ventureListInfo);
         investment.setAmount(amount);
         investment.setInvestedAt(LocalDateTime.now());
+        investment.setPayment(paymentSave);
 
         // Investment 저장
         return investmentRepository.save(investment);

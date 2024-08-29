@@ -4,6 +4,8 @@ package admin.adminbackend.controller;
 import admin.adminbackend.domain.Investment;
 import admin.adminbackend.dto.payment.PaymentDTO;
 import admin.adminbackend.repository.InvestmentRepository;
+import admin.adminbackend.service.AuthService;
+import admin.adminbackend.service.MyPageService;
 import admin.adminbackend.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,9 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class TestController {
 
-    private InvestmentRepository investmentRepository;
-    private PaymentService paymentService;
-
+    private final InvestmentRepository investmentRepository;
+    private final PaymentService paymentService;
+    private final MyPageService myPageService;
     @GetMapping("/testForm")
     public String test() {
         return "test";
@@ -37,11 +39,11 @@ public class TestController {
 
 
 
+
     @GetMapping("/paymentPage")
     public String paymentPage(
             @RequestParam("investmentId") Long investmentId,
-            @RequestParam("totalPrice") Long totalPrice,
-            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("email") String email,
             Model model
     ) {
 
@@ -54,11 +56,10 @@ public class TestController {
             return "redirect:/error"; // 예약 정보가 없을 경우 오류 페이지로 리다이렉트
         }
 
-
         String investmentUid = investment.getInvestmentUid();
-        log.info("reservationUid: {}", investmentUid);
+        log.info("investmentUid: {}", investmentUid);
         PaymentDTO requestDto = paymentService.findRequestDto(investmentUid);
-        requestDto.setMemberEmail(userDetails.getUsername());
+        requestDto.setMemberEmail(email);
         requestDto.setVentureName(investment.getVentureListInfo().getName());
         requestDto.setTotalPrice(investment.getAmount());
 
