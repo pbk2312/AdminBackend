@@ -52,10 +52,11 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/mypage/readIR").permitAll()
                         .requestMatchers("/mypage/**").authenticated()
                         .requestMatchers("/member/**").permitAll()
                         .requestMatchers("/venture/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 // CORS 설정 추가
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
