@@ -15,6 +15,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class VentureService {
     private final FileStore fileStore;
     private final VentureStatusService ventureStatusService;
 
-    public Long saveVenture(VentureListInfoForm form) throws IOException {
+    /*public Long saveVenture(VentureListInfoForm form) throws IOException {
         UploadFile attachFile = fileStore.storeFile(form.getAttachFile());
 
         JSONObject ventureStatus = ventureStatusService.getCompanyNum(form.getVentureNumber());
@@ -39,7 +40,7 @@ public class VentureService {
             form.setB_stt((String) ventureStatus.get("b_stt"));
         }
 
-        /*// 1. Venture 테이블에 데이터 저장
+        /*//* 1. Venture 테이블에 데이터 저장
         Venture venture = new Venture();
         venture.setVentureName(form.getVentureName());
         venture.setOwnerName(form.getOwnerName());
@@ -51,7 +52,7 @@ public class VentureService {
 
 
         // 2. VentureListInfo 테이블에 저장
-        VentureListInfo ventureListInfo = new VentureListInfo();
+        /*VentureListInfo ventureListInfo = new VentureListInfo();
 
         ventureListInfo.setCode(form.getCode());
         ventureListInfo.setMainProduct(form.getMainProduct());
@@ -73,7 +74,43 @@ public class VentureService {
 
 
         return savedVentureListInfo.getId();
+    }*/
+
+    public Long saveVenture(VentureListInfoForm form, MultipartFile file) throws IOException {
+        // 파일을 저장하고, 저장된 파일의 정보(예: 파일 경로, 이름 등)를 얻기
+        UploadFile attachFile = fileStore.storeFile(file);
+
+        // 기업 상태를 조회
+        JSONObject ventureStatus = ventureStatusService.getCompanyNum(form.getVentureNumber());
+        if (ventureStatus != null) {
+            form.setB_stt((String) ventureStatus.get("b_stt"));
+        }
+
+        // VentureListInfo 엔티티 객체를 생성, 폼 데이터를 설정
+        VentureListInfo ventureListInfo = new VentureListInfo();
+        ventureListInfo.setCode(form.getCode());
+        ventureListInfo.setMainProduct(form.getMainProduct());
+        ventureListInfo.setArea(form.getArea());
+        ventureListInfo.setAddress(form.getAddress());
+        ventureListInfo.setRegistInstitution(form.getRegistInstitution());
+        ventureListInfo.setEndDate(form.getEndDate());
+        ventureListInfo.setRegistType(form.getRegistType());
+        ventureListInfo.setTypeName(form.getTypeName());
+        ventureListInfo.setTypeName_spc(form.getTypeName_spc());
+        ventureListInfo.setName(form.getName());
+        ventureListInfo.setOwner(form.getOwner());
+        ventureListInfo.setStartDate(form.getStartDate());
+        ventureListInfo.setVentureNumber(form.getVentureNumber());
+        ventureListInfo.setAttachFile(attachFile); // 파일 정보를 설정
+        ventureListInfo.setB_stt(form.getB_stt());
+
+        // VentureListInfo 엔티티를 저장
+        VentureListInfo savedVentureListInfo = ventureListInfoRepository.save(ventureListInfo);
+
+        // 저장된 VentureListInfo의 ID를 반환
+        return savedVentureListInfo.getId();
     }
+
 
     public VentureListInfo getVentureById(Long id) {
         return ventureListInfoRepository.findById(id)
@@ -99,4 +136,3 @@ public class VentureService {
                 .body(resource);
     }
 }
-

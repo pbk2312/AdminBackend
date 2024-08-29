@@ -30,13 +30,6 @@ public class VentureListController {
     @Autowired
     private VentureListService ventureListService;
 
-   /* private final VentureListService ventureListService;
-
-    // 생성자 주입 (Constructor Injection)
-    public VentureListController(VentureListService ventureListService) {
-        this.ventureListService = ventureListService;
-    }*/
-
     @GetMapping("/list")
     @ResponseBody
     public JSONArray callApi(int page) {

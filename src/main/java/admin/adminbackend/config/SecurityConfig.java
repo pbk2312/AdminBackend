@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/mypage/**").authenticated()
                         .requestMatchers("/member/**").permitAll()
                         .requestMatchers("/venture/**").permitAll()
+                        .requestMatchers("/ventures/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 // CORS 설정 추가
