@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final InvestmentRepository investmentRepository;
 
 
 
