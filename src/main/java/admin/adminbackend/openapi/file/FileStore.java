@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -17,21 +16,26 @@ public class FileStore {
     private String fileDir;
 
     public String getFullPath(String filename) {
-        return fileDir + filename;
+        return fileDir /*+ "/"*/ + filename;
     }
 
     public UploadFile storeFile(MultipartFile multipartFile) throws IOException {
-        if(multipartFile.isEmpty()) {
+        if (multipartFile.isEmpty()) {
             return null;
         }
 
-        //image.png (파일명의 확장자 png 꺼내기)
-        //서버에 저장하는 파일명
-        //"qwe-qwe-123-qwe-qwe"에서 .png 붙여서 저장됨
+        // 원본 파일명과 저장할 파일명 생성
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(originalFilename);
-        multipartFile.transferTo(new File(getFullPath(storeFileName)));
-        return new UploadFile(originalFilename, storeFileName);
+
+        // 파일 경로 생성
+        String filePath = getFullPath(storeFileName);
+
+        // 파일 저장
+        multipartFile.transferTo(new File(filePath));
+
+        // 저장된 파일의 경로와 함께 UploadFile 객체 생성 및 반환
+        return new UploadFile(originalFilename, storeFileName, filePath);
     }
 
     private String createStoreFileName(String originalFilename) {
@@ -41,8 +45,7 @@ public class FileStore {
     }
 
     private String extractExt(String originalFilename) {
-        int pos = originalFilename.lastIndexOf("."); //위치 가져오기
+        int pos = originalFilename.lastIndexOf(".");
         return originalFilename.substring(pos + 1);
     }
 }
-
