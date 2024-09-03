@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+<div class="container">
+    <div class="py-5 text-center">
+        <h2>기업 조회 화면</h2>
+    </div>
+    기업명: <span th:text="${ventureListInfo.name}">기업명</span><br/>
+    대표자명: <span th:text="${ventureListInfo.owner}">대표자명</span><br/>
+    사업자 등록번호: <span th:text="${ventureListInfo.ventureNumber}">사업자 등록번호</span><br/>
+    신규_재확인코드: <span th:text="${ventureListInfo.code}">신규_재확인코드</span><br/>
+    주생산품: <span th:text="${ventureListInfo.mainProduct}">주생산품</span><br/>
+    지역: <span th:text="${ventureListInfo.area}">지역</span><br/>
+    간략주소: <span th:text="${ventureListInfo.address}">간략주소</span><br/>
+    벤처확인기관: <span th:text="${ventureListInfo.registInstitution}">벤처확인기관</span><br/>
+    벤처유효종료일: <span th:text="${ventureListInfo.endDate}">벤처유효종료일</span><br/>
+    벤처확인유형: <span th:text="${ventureListInfo.registType}">벤처확인유형</span><br/>
+    업종명: <span th:text="${ventureListInfo.typeName}">업종명</span><br/>
+    업종분류: <span th:text="${ventureListInfo.typeName_spc}">업종분류</span><br/>
+    벤처유효시작일: <span th:text="${ventureListInfo.startDate}">벤처유효시작일</span><br/>
+    사업자 상태: <span th:text="${ventureListInfo.b_stt}">사업자 상태</span><br/> <!-- 사업자 상태 표시 -->
+    첨부파일: <a th:if="${ventureListInfo.attachFile}" th:href="|/attach/${ventureListInfo.id}|"
+             th:text="${ventureListInfo.getAttachFile().getUploadFileName()}" /><br/>
+</div> <!-- /container -->
+</body>
+</html>

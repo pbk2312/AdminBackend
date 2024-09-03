@@ -1,28 +1,19 @@
 package admin.adminbackend.openapi.service;
 
-import admin.adminbackend.openapi.UtilService.UtilService;
-import lombok.RequiredArgsConstructor;
+import admin.adminbackend.openapi.controller.VentureStatusController;
+import admin.adminbackend.openapi.service.UtilService.UtilService;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
-@RestController
-@RequiredArgsConstructor
+@Service
 @Slf4j
-public class VentureStatusApiManager {
-
-    @PostMapping("/api/ventureStatus")
+public class VentureStatusService {
     public static JSONObject getCompanyNum(@org.springframework.web.bind.annotation.RequestBody String b_no) {
         //okhttp3으로 통신
         OkHttpClient client = new OkHttpClient().newBuilder().build();
@@ -56,15 +47,27 @@ public class VentureStatusApiManager {
                 JSONObject dataObject = (JSONObject) dataArray.get(0);
                 String b_stt = (String) dataObject.get("b_stt");
                 log.info("b_stt: {}", b_stt);
-                return dataObject;
+
+                // b_stt만 포함된 JSON 응답 생성
+                JSONObject result = new JSONObject();
+                result.put("b_stt", b_stt);
+                return result;
+
             } else {
                 log.error("Data array is null or empty");
-                return null;
+                //return null;
+                JSONObject errorResponse = new JSONObject();
+                errorResponse.put("error", "No data found");
+                return errorResponse;
             }
         } catch (Exception e) {
             log.error("Error occurred: {}", e.getMessage());
-            UtilService.ExceptionValue(e.getMessage(), VentureStatusApiManager.class);
-            return null;
+            UtilService.ExceptionValue(e.getMessage(), VentureStatusController.class);
+            //return null;
+            JSONObject errorResponse = new JSONObject();
+            errorResponse.put("error", "An error occurred while processing the request.");
+            return errorResponse;
         }
     }
 }
+

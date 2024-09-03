@@ -8,6 +8,10 @@ import admin.adminbackend.dto.register.MemberRequestDTO;
 import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
 import admin.adminbackend.dto.token.TokenRequestDTO;
+<<<<<<< HEAD
+=======
+import admin.adminbackend.repository.ResetTokenRepository;
+>>>>>>> Yoonseo
 import admin.adminbackend.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

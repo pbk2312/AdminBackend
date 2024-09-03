@@ -34,7 +34,6 @@ dependencies {
     // Thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'  // 이 줄을 추가합니다
 
-
     // 기타 의존성
     implementation 'org.modelmapper:modelmapper:3.1.0'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
@@ -42,6 +41,8 @@ dependencies {
     implementation 'com.google.guava:guava:30.1-jre'
 
     // Lombok
+    //implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2' // 최신 버전으로 변경
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
@@ -68,6 +69,13 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.projectlombok:lombok:1.18.30'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'org.apache.pdfbox:pdfbox:2.0.29'
+
 }
 
 tasks.named('test') {
