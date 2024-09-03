@@ -3,16 +3,18 @@ package admin.adminbackend.dto.email;
 
 import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
 public class EmailRequestDTO {
 
     @NotBlank

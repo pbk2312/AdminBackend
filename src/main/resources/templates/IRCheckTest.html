@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IR Check</title>
+</head>
+<body>
+<h1>IR Notification Check</h1>
+
+<!-- IR 알림 확인 폼 -->
+<form id="irCheckForm">
+  <label for="accessToken">Access Token:</label>
+  <input type="text" id="accessToken" name="accessToken" required>
+  <button type="submit">Check IR Notifications</button>
+</form>
+
+<div id="irNotifications">
+  <h2>IR Notifications:</h2>
+  <ul id="irList"></ul>
+</div>
+
+<!-- 이메일 발송 폼 추가 -->
+<div id="sendEmailForm" style="display: none;">
+  <h2>Send IR Email</h2>
+  <form id="sendEmail">
+    <input type="hidden" id="irId" name="irId">
+    <label for="file">Attach File:</label>
+    <input type="file" id="file" name="file" required>
+    <p id="personEmailDisplay"></p>
+    <button type="submit">Send Email</button>
+  </form>
+</div>
+
+<p id="responseMessage"></p>
+
+<script>
+  document.getElementById('irCheckForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const accessToken = document.getElementById('accessToken').value;
+    const responseMessage = document.getElementById('responseMessage');
+    const irList = document.getElementById('irList');
+
+    try {
+      const response = await fetch('http://localhost:8080/mypage/IRCheck', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,  // 액세스 토큰을 헤더에 추가
+          'Content-Type': 'application/json'  // 응답을 JSON으로 처리
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        irList.innerHTML = '';  // 기존 IR 목록 비우기
+        if (data.length === 0) {
+          responseMessage.textContent = 'No IR notifications found.';
+          document.getElementById('sendEmailForm').style.display = 'none';  // IR이 없으면 이메일 폼 숨기기
+        } else {
+          data.forEach(ir => {
+            const li = document.createElement('li');
+            // IR 알림의 속성에 맞게 텍스트를 수정
+            li.textContent = `ID: ${ir.id}, 수령인 이메일: ${ir.ventureEmail}, 투자자 이메일: ${ir.personEmail}, 읽음 여부: ${ir.isRead}, 날짜: ${new Date(ir.createdAt).toLocaleString()}`;
+            irList.appendChild(li);
+
+            // 이메일 발송 폼 업데이트
+            const emailForm = document.getElementById('sendEmailForm');
+            document.getElementById('irId').value = ir.id;  // IR ID 숨겨진 필드에 값 설정
+            document.getElementById('personEmailDisplay').textContent = `투자자 이메일: ${ir.personEmail}`;  // 발송인 이메일 표시
+            emailForm.style.display = 'block';  // 이메일 발송 폼 표시
+          });
+          responseMessage.textContent = '';  // 응답이 성공적일 때는 메시지 지우기
+        }
+      } else {
+        const errorText = await response.text();
+        responseMessage.textContent = `Failed to retrieve IR notifications: ${errorText}`;
+      }
+    } catch (error) {
+      responseMessage.textContent = 'Failed to retrieve IR notifications.';
+      console.error('Error:', error);
+    }
+  });
+
+  document.getElementById('sendEmail').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const accessToken = document.getElementById('accessToken').value;
+    const irId = document.getElementById('irId').value;
+    const fileInput = document.getElementById('file');
+    const responseMessage = document.getElementById('responseMessage');
+
+    if (!fileInput.files.length) {
+      responseMessage.textContent = 'Please select a file to attach.';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('IRId', irId);
+    formData.append('file', fileInput.files[0]);
+
+    try {
+      const response = await fetch('http://localhost:8080/mypage/sendIR', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`  // 액세스 토큰을 헤더에 추가
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        const result = await response.text();
+        responseMessage.textContent = result;  // 이메일 전송 성공 메시지
+      } else {
+        const errorText = await response.text();
+        responseMessage.textContent = `Failed to send email: ${errorText}`;
+      }
+    } catch (error) {
+      responseMessage.textContent = 'Failed to send email.';
+      console.error('Error:', error);
+    }
+  });
+</script>
+</body>
+</html>

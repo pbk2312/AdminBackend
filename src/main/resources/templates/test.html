@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IR Notification Test</title>
+</head>
+<body>
+<h1>IR Notification Test</h1>
+
+
+<form id="irForm">
+  <label for="ventureName">Venture Name:</label>
+  <input type="text" id="ventureName" name="ventureName" required>
+  <label for="accessToken">Access Token:</label>
+  <input type="text" id="accessToken" name="accessToken" required>
+  <button type="submit">Send IR</button>
+</form>
+
+
+<form id="paymentForm">
+  <label for="investmentId">Investment ID:</label>
+  <input type="text" id="investmentId" name="investmentId" required>
+
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" required> <!-- 이메일 입력 필드 추가 -->
+
+
+  <button type="submit">Go to Payment Page</button>
+</form>
+
+<script>
+
+  document.getElementById('irForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const ventureName = document.getElementById('ventureName').value;
+    const accessToken = document.getElementById('accessToken').value;
+    const responseMessage = document.getElementById('responseMessage');
+
+    try {
+      const response = await fetch('http://localhost:8080/venture/info', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Bearer ${accessToken}`  // 액세스 토큰을 헤더에 추가
+        },
+        body: new URLSearchParams({ ventureName: ventureName })
+      });
+
+      if (response.ok) {
+        const message = await response.text();
+        responseMessage.textContent = message;
+      } else {
+        responseMessage.textContent = 'IR 요청 실패';
+      }
+    } catch (error) {
+      responseMessage.textContent = 'IR 요청 실패';
+      console.error('Error:', error);
+    }
+  });
+
+
+  document.getElementById('paymentForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const investmentId = document.getElementById('investmentId').value;
+    const email = document.getElementById('email').value; // 이메일 값 가져오기
+
+    // GET 요청으로 URL에 쿼리 파라미터로 추가
+    const url = `/paymentPage?investmentId=${encodeURIComponent(investmentId)}&email=${encodeURIComponent(email)}`;
+
+    // 페이지 이동
+    window.location.href = url;
+  });
+</script>
+</body>
+</html>

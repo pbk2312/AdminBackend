@@ -23,50 +23,51 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Starters
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.modelmapper:modelmapper:3.1.0'
-    implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    //implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-    //추가
-    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-    //추가 0501
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
+    // Thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'  // 이 줄을 추가합니다
 
+
+    // 기타 의존성
+    implementation 'org.modelmapper:modelmapper:3.1.0'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.google.guava:guava:30.1-jre'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
 
+    // MariaDB
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-    implementation 'javax.validation:validation-api:2.0.1.Final'
+    // Hibernate Validator (Jakarta EE)
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.0'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
 
-    //implementation 'jakarta.validation:validation-api'
-    implementation 'org.hibernate.validator:hibernate-validator'
-
-
-    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
-
-    // jwt
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
-
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     // 아임포트
     implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
-    implementation 'com.google.guava:guava:30.1-jre' // 최신 버전 확인하여 업데이트 가능
+    // Spring Boot Configuration Processor
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
+    // 테스트 의존성
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
 
 tasks.named('test') {

@@ -1,56 +1,46 @@
 package admin.adminbackend.domain;
+
+
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
-@AllArgsConstructor
-@Builder
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor
 @Setter
-@Table(name = "payments", indexes = @Index(name = "index_payments_order_id", columnList = "orderId"))
-@ToString
 public class Payment {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "buyer_id")
-    @ManyToOne
-    private Member buyer; // 구매자
 
-    @Column(nullable = false, unique = true)
-    private String receiptId; // PG 사에서 생성한 주문 번호
+    private Long price; // 투자 결제 금액
 
-    @Column(nullable = false, unique = true)
-    private String orderId; // 우리가 생성한 주문 번호
+    @Enumerated(EnumType.STRING) // 열거형을 문자열로 저장
+    private PaymentStatus status;
 
-    private PaymentMethod method; // 결제 수단
+    private String paymentUid; // 결제 고유 번호
 
-    private String name; // 결제 이름
+    @Builder
+    public Payment(Long price, PaymentStatus status) {
+        this.price = price;
+        this.status = status;
+    }
 
-    @Column(nullable = false)
-    private BigDecimal amount; // 결제 금액
+    public void changePaymentBySuccess(PaymentStatus status, String paymentUid) {
+        this.status = status;
+        this.paymentUid = paymentUid;
+    }
 
-    @Builder.Default
-    @Column(nullable = false)
-    private PaymentStatus status = PaymentStatus.READY; // 상태
 
-    @CreatedDate
-    private LocalDateTime createAt; // 결제 요청 일시
+    @OneToMany(mappedBy = "payment")
+    private List<Investment> investments; // 투자 내역
 
-    private LocalDateTime paidAt; // 결제 완료 일시
 
-    private LocalDateTime failedAt; // 결제 실패 일시
-
-    @Builder.Default
-    private BigDecimal cancelledAmount = BigDecimal.ZERO; // 취소된 금액
-
-    private LocalDateTime cancelledAt; // 결제 취소 일시
 }
