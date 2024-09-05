@@ -1,4 +1,4 @@
-package admin.adminbackend.openapi.dto;
+package admin.adminbackend.openapi.domain;
 
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;

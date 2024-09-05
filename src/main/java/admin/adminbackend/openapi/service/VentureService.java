@@ -4,7 +4,7 @@ import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
 import admin.adminbackend.openapi.Repository.VentureRepository;
 import admin.adminbackend.openapi.domain.UploadFile;
 import admin.adminbackend.openapi.domain.VentureListInfo;
-import admin.adminbackend.openapi.dto.VentureListInfoForm;
+import admin.adminbackend.openapi.domain.VentureListInfoForm;
 import admin.adminbackend.openapi.exception.ResourceNotFoundException;
 import admin.adminbackend.openapi.file.FileStore;
 import lombok.RequiredArgsConstructor;

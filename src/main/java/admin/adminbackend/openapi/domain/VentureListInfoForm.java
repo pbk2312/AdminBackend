@@ -1,4 +1,4 @@
-package admin.adminbackend.openapi.dto;
+package admin.adminbackend.openapi.domain;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

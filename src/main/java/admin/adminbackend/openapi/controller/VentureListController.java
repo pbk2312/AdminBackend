@@ -1,26 +1,16 @@
 package admin.adminbackend.openapi.controller;
 
-import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
 import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.openapi.service.VentureListService;
 import lombok.extern.log4j.Log4j2;
 
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 //import net.minidev.json.JSONArray;
 //import net.minidev.json.JSONObject;
 //import net.minidev.json.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 
 @RestController
 @Log4j2

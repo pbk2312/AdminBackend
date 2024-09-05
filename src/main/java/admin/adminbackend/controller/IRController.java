@@ -1,8 +1,8 @@
 package admin.adminbackend.controller;
 
 import admin.adminbackend.domain.Member;
-import admin.adminbackend.openapi.dto.VentureListInfo;
-import admin.adminbackend.openapi.service.VentureListInfoService;
+import admin.adminbackend.openapi.domain.VentureListInfo;
+import admin.adminbackend.openapi.service.VentureListService;
 import admin.adminbackend.service.MyPageService;
 import admin.adminbackend.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/venture")
 public class IRController {
 
-    private final VentureListInfoService ventureListInfoService;
+    private final VentureListService ventureListInfoService;
     private final MyPageService myPageService;
     private final TokenProvider tokenProvider;
 
@@ -56,7 +56,7 @@ public class IRController {
     @PostMapping("/info")
     public ResponseEntity<String> sendIR(
             HttpServletRequest request,
-            @RequestParam("ventureName") String ventureName
+            @RequestParam("id") Long ventureId
     ) {
         try {
             // 쿠키에서 인증 정보 가져오기
@@ -66,8 +66,8 @@ public class IRController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 정보를 가져올 수 없습니다.");
             }
 
-            log.info("ventureName = {}", ventureName);
-            VentureListInfo ventureInfo = ventureListInfoService.getCompanyByName(ventureName);
+            log.info("ventureId = {}", ventureId);
+            VentureListInfo ventureInfo = ventureListInfoService.getCompanyById(ventureId);
             Member member = ventureInfo.getMember();
             Member shipper = myPageService.getMemberInfo(userDetails.getUsername());
 
