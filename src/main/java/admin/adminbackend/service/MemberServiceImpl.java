@@ -5,6 +5,7 @@ import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.RefreshToken;
 import admin.adminbackend.domain.ResetToken;
+import admin.adminbackend.dto.WithdrawalMembershipDTO;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
 import admin.adminbackend.dto.login.LoginDTO;
@@ -15,6 +16,7 @@ import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
 import admin.adminbackend.dto.token.TokenRequestDTO;
 import admin.adminbackend.email.EmailProvider;
+import admin.adminbackend.exception.*;
 import admin.adminbackend.repository.EmailRepository;
 import admin.adminbackend.repository.MemberRepository;
 import admin.adminbackend.repository.RefreshTokenRepository;
@@ -25,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +38,7 @@ import java.util.Random;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AuthService {
+public class MemberServiceImpl implements MemberService{
 
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -50,6 +53,7 @@ public class AuthService {
     // 회원가입
 
     @Transactional
+    @Override
     public MemberResponseDTO register(MemberRequestDTO memberRequestDTO) {
         // 이메일로 인증번호 조회
         EmailCertification emailCertification = emailRepository.findByCertificationEmail(memberRequestDTO.getEmail())
@@ -175,14 +179,11 @@ public class AuthService {
         return "비밀번호 변경이 완료되었습니다.";
     }
 
+    public String sendPasswordResetEmail(EmailRequestDTO emailRequestDTO) {
 
-
-    // 비밀번호 찾기
-    public EmailResponseDTO sendPasswordResetEmail(EmailRequestDTO emailRequestDTO) {
-
-        // 해당 이메일로 회원을 찾습니다.
-        Member member = memberRepository.findByEmail(emailRequestDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+        // 회원 이메일 존재 여부 확인
+        memberRepository.findByEmail(emailRequestDTO.getEmail())
+                .orElseThrow(() -> new EmailNotFoundException("존재하지 않는 회원입니다."));
 
         // 임시 비밀번호 생성
         String resetToken = generateResetToken();
@@ -199,10 +200,10 @@ public class AuthService {
         // 이메일 보내기
         boolean emailSent = emailProvider.sendPasswordResetEmail(emailRequestDTO, resetLink);
         if (!emailSent) {
-            throw new RuntimeException("이메일 발송에 실패했습니다.");
+            throw new SpecificException("이메일 발송에 실패했습니다.");
         }
 
-        return EmailResponseDTO.change(emailRequestDTO);
+        return "비밀번호 재설정 이메일 전송 성공";
     }
 
 
@@ -223,10 +224,54 @@ public class AuthService {
 
     }
 
+    @Override
+    public Member getUserDetails(String accessToken) {
+        if (isInvalidToken(accessToken)) {
+            throw new UnauthorizedException("인증되지 않은 사용자입니다.");
+        }
+
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        return findByEmail(userDetails.getUsername());
+    }
+
+    // 회원 찾기
+    @Override
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new EmailNotFoundException("이메일을 찾을 수 없습니다."));
+
+    }
+
+    @Override
+    @Transactional
+    public String deleteAccount(WithdrawalMembershipDTO withdrawalMembershipDTO) {
+        Member member = memberRepository.findByEmail(withdrawalMembershipDTO.getEmail()).orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원 입니다."));
+        validatePassword(withdrawalMembershipDTO.getPassword(), member.getPassword());
+        // 해당 회원의 RefreshToken을 삭제합니다.
+        refreshTokenRepository.deleteByEmail(member.getEmail());
+
+        memberRepository.delete(member);
+
+        log.info("회원 정보 삭제...");
 
 
+        return "회원 정보가 정상적으로 삭제되었습니다.";
+
+    }
+
+    public void validatePassword(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new IncorrectPasswordException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+
+    private boolean isInvalidToken(String accessToken) {
+        return accessToken == null || !tokenProvider.validate(accessToken);
+    }
     // 새로운 AccessToken 과 RefreshToken 발급
-
     @Transactional
     public TokenDTO reissuance(TokenRequestDTO tokenRequestDTO) {
 

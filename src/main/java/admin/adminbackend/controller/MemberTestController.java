@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/mypage")
-public class AuthTestController {
+public class MemberTestController {
 
     @GetMapping("/test")
     public String testAuthentication(@AuthenticationPrincipal UserDetails userDetails) {

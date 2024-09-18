@@ -3,7 +3,6 @@ package admin.adminbackend.controller;
 import admin.adminbackend.domain.Investment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.jwt.TokenProvider;
-import admin.adminbackend.service.AuthService;
 import admin.adminbackend.service.InvestmentService;
 import admin.adminbackend.service.MyPageService;
 import lombok.RequiredArgsConstructor;
