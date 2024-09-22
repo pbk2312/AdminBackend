@@ -38,7 +38,7 @@ import java.util.Random;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class MemberServiceImpl implements MemberService{
+public class MemberServiceImpl implements MemberService {
 
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -80,43 +80,18 @@ public class MemberServiceImpl implements MemberService{
     }
 
 
-    // 탈퇴하기
-    @Transactional
-    public MemberResponseDTO withdrawalMembership(LoginDTO loginDTO) {
-        String withdrawalMembershipEmail = loginDTO.getEmail();
-        String withdrawalMembershipPassword = loginDTO.getPassword();
-
-        // 해당 이메일로 회원을 찾습니다.
-        Member member = memberRepository.findByEmail(withdrawalMembershipEmail)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
-
-        // 회원의 비밀번호를 확인합니다.
-        if (!passwordEncoder.matches(withdrawalMembershipPassword, member.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-        }
-
-        // 해당 회원의 RefreshToken을 삭제합니다.
-        refreshTokenRepository.deleteByEmail(withdrawalMembershipEmail);
-
-        // 회원을 삭제합니다.
-        memberRepository.delete(member);
-
-        log.info("회원탈퇴가 완료되었습니다.");
-
-        return MemberResponseDTO.of(member);
-    }
 
 
     // 로그인 시도
     @Transactional
     public TokenDTO login(LoginDTO loginDTO) {
         log.info("로그인 시도: 사용자 아이디={}", loginDTO.getEmail());
-
+        Member member = findByEmail(loginDTO.getEmail());
+        validatePassword(loginDTO.getPassword(), member.getPassword());
         // 1. 로그인 ID/PW를 기반으로 AuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken = loginDTO.toAuthentication();
 
         // 2. 실제로 검증 (사용자 비밀번호 체크) 이 이루어지는 부분
-        // authenticate 메서드가 실행이 될 때 CustomUserDetailService 에서 만들었던 loadUserByUsername 메서드 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         log.info("사용자 인증 완료: 사용자 아이디={}", authentication.getName());
 
@@ -137,7 +112,6 @@ public class MemberServiceImpl implements MemberService{
         log.info("로그인 완료: 사용자 아이디={}", authentication.getName());
         return tokenDTO;
     }
-
 
     // 로그아웃
     @Transactional
@@ -271,6 +245,7 @@ public class MemberServiceImpl implements MemberService{
     private boolean isInvalidToken(String accessToken) {
         return accessToken == null || !tokenProvider.validate(accessToken);
     }
+
     // 새로운 AccessToken 과 RefreshToken 발급
     @Transactional
     public TokenDTO reissuance(TokenRequestDTO tokenRequestDTO) {

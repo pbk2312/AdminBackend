@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface IRNotificationRepository extends JpaRepository<IRNotification, Long> {
 
-    List<IRNotification> findByVentureAndIsReadFalse(Member venture); // 메서드 이름을 변경
+    List<IRNotification> findByceoAndIsReadFalse(Member ceo); // 메서드 이름을 변경
 
 }

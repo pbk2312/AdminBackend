@@ -17,7 +17,7 @@ public interface MemberService {
 
     // 회원 탈퇴를 처리하는 메서드
     String deleteAccount(WithdrawalMembershipDTO withdrawalMembershipDTO);
-    EmailResponseDTO sendCertificationMail(EmailRequestDTO emailRequestDTO)
+    EmailResponseDTO sendCertificationMail(EmailRequestDTO emailRequestDTO);
 
     // 비밀번호 재설정을 위한 이메일을 발송하는 메서드
     String sendPasswordResetEmail(EmailRequestDTO emailRequestDTO);

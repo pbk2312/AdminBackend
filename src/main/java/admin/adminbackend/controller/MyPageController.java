@@ -76,82 +76,9 @@ public class MyPageController {
         return "mypage/memberInfo";
     }
 
-    @GetMapping("/IRCheck")
-    public ResponseEntity<?> IRCheck(
-            @CookieValue(value = "accessToken", required = false) String accessToken,
-            HttpServletRequest request) {
-
-        Member member = memberService.getUserDetails(accessToken);
-
-        try {
-            // 사용자 정보를 기반으로 멤버 객체 조회
-            Member venture = myPageService.getMemberInfo(member.getEmail());
-            log.info("IR 조회 요청을 받은 멤버: {}", venture);
-
-            // 멤버를 기반으로 IRNotification 리스트 조회 및 DTO로 변환
-            List<IRNotificationDTO> irNotificationDTOList = myPageService.findIRList(venture);
-
-            if (irNotificationDTOList.isEmpty()) {
-                log.info("멤버 {}의 IR 리스트가 비어 있습니다.", venture);
-                return ResponseEntity.ok(Collections.emptyList());
-            }
-
-            log.info("멤버 {}의 IR 리스트를 반환합니다. 총 {} 건", venture, irNotificationDTOList.size());
-            return ResponseEntity.ok(irNotificationDTOList);
-        } catch (Exception e) {
-            log.error("IR 조회 중 오류 발생: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("IR 알림 조회 중 오류가 발생했습니다.");
-        }
-    }
-
-    @PostMapping("/sendIR")
-    public ResponseEntity<String> sendIR(HttpServletRequest request
-            , @CookieValue(value = "accessToken", required = false) String accessToken,
-                                         @RequestParam("IRId") Long IRId,
-                                         @RequestParam("file") MultipartFile file) {
-        Member member = memberService.getUserDetails(accessToken);
 
 
-        // 사용자 정보를 기반으로 멤버 객체 조회
-        Member venture = myPageService.getMemberInfo(member.getEmail());
-        log.info("IR 전송 멤버: {}", venture);
 
-        IRNotification irNotification = myPageService.findIRSendMember(IRId);
-        Member getPerson = irNotification.getPerson();
-
-        String readUrl = "http://localhost:8080/mypage/readIR?IRId=" + IRId;
-
-        String subject = "[스타트업 투자 플랫폼] IR 자료";
-        String body = "안녕하세요,\n\n첨부된 파일을 확인해 주세요.\n" +
-                "IR 자료를 읽으시면 다음 링크를 클릭하여 자금투자계약서를 작성해주세요: " + readUrl + "\n\n감사합니다.";
-
-        boolean result = emailProvider.sendFileEmail(getPerson.getEmail(), subject, body, file);
-
-        if (result) {
-            return ResponseEntity.ok("이메일 전송 성공");
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패");
-        }
-    }
-
-    @GetMapping("/readIR")
-    public ResponseEntity<String> readIR(
-            @CookieValue(value = "accessToken", required = false) String accessToken,
-            @RequestParam("IRId") Long IRId) {
-
-        Member member = memberService.getUserDetails(accessToken);
-
-        IRNotification irNotification = myPageService.findIRSendMember(IRId);
-
-        if (irNotification != null) {
-            irNotification.setRead(true);
-            myPageService.saveIRNotification(irNotification);
-            return ResponseEntity.ok("IR 자료를 읽었습니다.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("IR 자료를 찾을 수 없습니다.");
-        }
-    }
 
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {

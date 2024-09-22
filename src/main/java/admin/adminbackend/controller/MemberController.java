@@ -11,6 +11,7 @@ import admin.adminbackend.dto.register.MemberChangePasswordDTO;
 import admin.adminbackend.dto.register.MemberRequestDTO;
 import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
+import admin.adminbackend.exception.InvalidTokenException;
 import admin.adminbackend.exception.SpecificException;
 import admin.adminbackend.repository.ResetTokenRepository;
 import admin.adminbackend.service.MemberService;
@@ -92,15 +93,29 @@ public class MemberController {
                                                  @RequestParam("email") String email,
                                                  @RequestBody MemberChangePasswordDTO memberChangePasswordDTO) {
         try {
+            // 요청 데이터 확인
+            if (resetToken == null || email == null || memberChangePasswordDTO == null) {
+                return ResponseEntity.badRequest().body("요청 데이터가 부족합니다.");
+            }
+
+
+            // 토큰 유효성 검사
             validateResetToken(email, resetToken);
+
+            // 비밀번호 변경
             memberChangePasswordDTO.setEmail(email);
             memberService.memberChangePassword(memberChangePasswordDTO);
+
             return ResponseEntity.ok("비밀번호 변경이 완료되었습니다.");
+        } catch (InvalidTokenException e) {
+            log.warn("비밀번호 변경 시 유효하지 않은 토큰 사용: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
         } catch (RuntimeException e) {
             log.error("비밀번호 변경 중 오류 발생: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 변경 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 변경 중 오류가 발생했습니다.");
         }
     }
+
 
     private void validateResetToken(String email, String resetToken) {
         ResetToken storedToken = resetTokenRepository.findByEmail(email)
@@ -139,10 +154,12 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
     private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setHttpOnly(false); // https로 할때는 true로
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
         response.addCookie(cookie);
