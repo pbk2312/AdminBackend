@@ -1,9 +1,9 @@
 package admin.adminbackend.service;
 
 
+import admin.adminbackend.RedisService;
 import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
-import admin.adminbackend.domain.RefreshToken;
 import admin.adminbackend.domain.ResetToken;
 import admin.adminbackend.dto.WithdrawalMembershipDTO;
 import admin.adminbackend.dto.email.EmailRequestDTO;
@@ -19,7 +19,6 @@ import admin.adminbackend.email.EmailProvider;
 import admin.adminbackend.exception.*;
 import admin.adminbackend.repository.EmailRepository;
 import admin.adminbackend.repository.MemberRepository;
-import admin.adminbackend.repository.RefreshTokenRepository;
 import admin.adminbackend.jwt.TokenProvider;
 import admin.adminbackend.repository.ResetTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -45,13 +44,15 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisService redisService;
     private final EmailProvider emailProvider;
     private final EmailRepository emailRepository;
     private final ResetTokenRepository resetTokenRepository;
 
-    // 회원가입
 
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
+
+    // 회원가입
     @Transactional
     @Override
     public MemberResponseDTO register(MemberRequestDTO memberRequestDTO) {
@@ -80,14 +81,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
-
-
-    // 로그인 시도
     @Transactional
     public TokenDTO login(LoginDTO loginDTO) {
         log.info("로그인 시도: 사용자 아이디={}", loginDTO.getEmail());
         Member member = findByEmail(loginDTO.getEmail());
         validatePassword(loginDTO.getPassword(), member.getPassword());
+
         // 1. 로그인 ID/PW를 기반으로 AuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken = loginDTO.toAuthentication();
 
@@ -99,14 +98,9 @@ public class MemberServiceImpl implements MemberService {
         TokenDTO tokenDTO = tokenProvider.generateTokenDto(authentication);
         log.info("JWT 토큰 생성 완료");
 
-        // 4. RefreshToken 저장
-        RefreshToken refreshToken = RefreshToken.builder()
-                .email(loginDTO.getEmail())
-                .key(authentication.getName())
-                .value(tokenDTO.getRefreshToken())
-                .build();
-        refreshTokenRepository.save(refreshToken);
-        log.info("RefreshToken 저장 완료: 사용자 아이디={}", authentication.getName());
+        // 4. Redis에 RefreshToken 저장
+        redisService.setStringValue(String.valueOf(member.getId()), tokenDTO.getRefreshToken(), REFRESH_TOKEN_EXPIRE_TIME);
+        log.info("Redis에 RefreshToken 저장 완료: 사용자 아이디={}", authentication.getName());
 
         // 5. 토큰 발급
         log.info("로그인 완료: 사용자 아이디={}", authentication.getName());
@@ -115,23 +109,15 @@ public class MemberServiceImpl implements MemberService {
 
     // 로그아웃
     @Transactional
-    public LogoutDTO logout(LogoutDTO logoutDTO) {
-        log.info("로그아웃을 시도합니다...");
+    public void logout(LogoutDTO logoutDTO) {
+        log.info("로그아웃 시도: 사용자 아이디={}", logoutDTO.getEmail());
 
-        String logoutEmail = logoutDTO.getEmail();
+        // 이메일로 멤버 찾기
+        Member member = findByEmail(logoutDTO.getEmail());
 
-        Optional<RefreshToken> findRefreshToeken = refreshTokenRepository.findByEmail(logoutEmail);
-
-        // RefreshToken이 존재하면 삭제
-        findRefreshToeken.ifPresent(refreshToken -> {
-            refreshTokenRepository.delete(refreshToken);
-            log.info("RefreshToken 삭제 완료: 사용자 이메일={}", logoutEmail);
-        });
-
-        log.info("로그아웃이 완료되었습니다.");
-
-
-        return logoutDTO;
+        // Redis에서 Refresh Token 삭제
+        redisService.deleteStringValue(String.valueOf(member.getId()));
+        log.info("Redis에서 RefreshToken 삭제 완료: 사용자 아이디={}", logoutDTO.getEmail());
     }
 
     // 비밀번호 재설정
@@ -180,6 +166,17 @@ public class MemberServiceImpl implements MemberService {
         return "비밀번호 재설정 이메일 전송 성공";
     }
 
+    public Member findByRefreshToken(String refreshToken) {
+        // Redis에서 refreshToken으로 memberId 찾기
+        String memberId = redisService.findMemberIdByRefreshToken(refreshToken);
+        if (memberId != null) {
+            // memberId로 Member 정보 조회
+            return memberRepository.findById(Long.valueOf(memberId))
+                    .orElseThrow(() -> new IllegalArgumentException("해당하는 사용자를 찾을 수 없습니다."));
+        }
+        throw new IllegalArgumentException("유효하지 않은 refreshToken입니다.");
+    }
+
 
     @Transactional
     public EmailResponseDTO sendCertificationMail(EmailRequestDTO emailRequestDTO) {
@@ -221,10 +218,9 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public String deleteAccount(WithdrawalMembershipDTO withdrawalMembershipDTO) {
-        Member member = memberRepository.findByEmail(withdrawalMembershipDTO.getEmail()).orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원 입니다."));
+        Member member = memberRepository.findByEmail(withdrawalMembershipDTO.getEmail()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원 입니다."));
         validatePassword(withdrawalMembershipDTO.getPassword(), member.getPassword());
         // 해당 회원의 RefreshToken을 삭제합니다.
-        refreshTokenRepository.deleteByEmail(member.getEmail());
 
         memberRepository.delete(member);
 
@@ -235,6 +231,7 @@ public class MemberServiceImpl implements MemberService {
 
     }
 
+
     public void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new IncorrectPasswordException("비밀번호가 일치하지 않습니다.");
@@ -244,38 +241,6 @@ public class MemberServiceImpl implements MemberService {
 
     private boolean isInvalidToken(String accessToken) {
         return accessToken == null || !tokenProvider.validate(accessToken);
-    }
-
-    // 새로운 AccessToken 과 RefreshToken 발급
-    @Transactional
-    public TokenDTO reissuance(TokenRequestDTO tokenRequestDTO) {
-
-        // 1. RefreshToken 유효한지 검증
-        if (!tokenProvider.validate(tokenRequestDTO.getRefreshToken())) {
-            throw new RuntimeException("Refresh Token이 유효 X");
-        }
-
-        // 2. Access token 에서 Member ID 가져오기
-        Authentication authentication = tokenProvider.getAuthentication(tokenRequestDTO.getAccessToken());
-
-        // 3. 저장소에서 Member ID 를 기반으로 Refresh Token 값 가져옴
-        RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
-                .orElseThrow(() -> new RuntimeException("로그아웃된 사용자"));
-
-        // 4. Refresh Token 일치하는지 검사
-        if (!refreshToken.getValue().equals(tokenRequestDTO.getRefreshToken())) {
-            throw new RuntimeException("토큰의 유저 정보가 일치하지 않습니다");
-        }
-
-        // 5. 새로운 토큰 생성
-        TokenDTO tokenDTO = tokenProvider.generateTokenDto(authentication);
-
-        // 6. 저장소 정보 업데이트
-        RefreshToken newRefreshToken = refreshToken.updateValue(tokenDTO.getRefreshToken());
-        refreshTokenRepository.save(newRefreshToken);
-
-        return tokenDTO;
-
     }
 
     // 난수 생성 메서드

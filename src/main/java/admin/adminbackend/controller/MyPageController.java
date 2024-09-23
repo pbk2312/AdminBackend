@@ -35,9 +35,7 @@ import java.util.List;
 @Slf4j
 public class MyPageController {
 
-    private final MyPageService myPageService;
     private final MemberServiceImpl memberService;
-    private final EmailProvider emailProvider;
     private final PasswordEncoder passwordEncoder;
 
 

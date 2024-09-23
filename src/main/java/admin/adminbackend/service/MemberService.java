@@ -24,7 +24,7 @@ public interface MemberService {
 
     TokenDTO login(LoginDTO loginDTO);
 
-    LogoutDTO logout(LogoutDTO logoutDTO);
+    void logout(LogoutDTO logoutDTO);
 
     String memberChangePassword(MemberChangePasswordDTO memberChangePasswordDTO);
 
@@ -32,4 +32,6 @@ public interface MemberService {
     Member getUserDetails(String accessToken);
 
     Member findByEmail(String email);
+
+    Member findByRefreshToken(String refreshToken);
 }
