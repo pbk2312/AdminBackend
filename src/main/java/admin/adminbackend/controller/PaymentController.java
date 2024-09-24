@@ -2,7 +2,6 @@ package admin.adminbackend.controller;
 
 
 import admin.adminbackend.dto.payment.PaymentCallbackRequest;
-import admin.adminbackend.repository.InvestmentRepository;
 import admin.adminbackend.service.PaymentService;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;

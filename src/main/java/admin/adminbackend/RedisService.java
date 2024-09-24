@@ -17,7 +17,6 @@ public class RedisService {
 
 
     private final StringRedisTemplate stringRedisTemplate;
-    private final ObjectMapper objectMapper; // ObjectMapper 주입
 
     public void setStringValue(String memberId, String token, Long expirationTime) {
         ValueOperations<String, String> stringValueOperations = stringRedisTemplate.opsForValue();
