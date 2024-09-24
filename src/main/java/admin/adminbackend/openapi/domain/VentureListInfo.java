@@ -1,11 +1,16 @@
 package admin.adminbackend.openapi.domain;
 
+import admin.adminbackend.domain.Investment;
+import admin.adminbackend.domain.Member;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Entity
 @Data
 public class VentureListInfo {
+
     private String code; //신규_재확인코드
     private String mainProduct; //주생산품
     private String area; //지역
@@ -40,4 +45,15 @@ public class VentureListInfo {
                            String registInstitution, String endDate, String registType, String typeName, String typeNameSpc,
                            String name, Long id, String owner, String startDate) {
     }
+
+    @OneToOne
+    @JoinColumn(name = "member_id", nullable = true)
+    private Member member;
+
+
+    @OneToMany(mappedBy = "ventureListInfo")
+    private List<Investment> investments; // List to hold investments related to this VentureListInfo
+
+
+
 }

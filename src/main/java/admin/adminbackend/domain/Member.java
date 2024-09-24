@@ -1,6 +1,7 @@
 package admin.adminbackend.domain;
 
-import admin.adminbackend.openapi.dto.VentureListInfo;
+import admin.adminbackend.dto.MemberDTO;
+import admin.adminbackend.openapi.domain.VentureListInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,4 +31,13 @@ public class Member {
 
     @OneToMany(mappedBy = "investor")
     private List<Investment> investments; // 투자 내역
+
+
+    // Member -> MemberDTO 변환 메소드
+    public MemberDTO toMemberDTO() {
+        return MemberDTO.builder()
+                .id(this.id)
+                .email(this.email)
+                .memberRole(this.memberRole != null ? this.memberRole.name() : null).build();
+    }
 }

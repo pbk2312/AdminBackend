@@ -1,7 +1,6 @@
 package admin.adminbackend.domain;
 
-import admin.adminbackend.openapi.dto.VentureListInfo;
-import admin.adminbackend.openapi.dto.VentureStatusInfo;
+import admin.adminbackend.openapi.domain.VentureListInfo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -4,8 +4,8 @@ import admin.adminbackend.domain.Investment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.Payment;
 import admin.adminbackend.domain.PaymentStatus;
-import admin.adminbackend.openapi.dto.VentureListInfo;
-import admin.adminbackend.openapi.dto.VentureListInfoRepository;
+import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
+import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.repository.InvestmentRepository;
 import admin.adminbackend.repository.MemberRepository;
 import admin.adminbackend.repository.PaymentRepository;
@@ -35,9 +35,7 @@ public class InvestmentService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         // 벤처 정보(VentureListInfo) 조회
-        VentureListInfo ventureListInfo = ventureListInfoRepository.findById(ventureId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid venture ID"));
-
+        VentureListInfo ventureListInfo = ventureListInfoRepository.getReferenceById(ventureId);
         // 결제 정보 저장
         Payment payment = new Payment(amount, PaymentStatus.PENDING);
         Payment paymentSave = paymentRepository.save(payment);// Payment 저장

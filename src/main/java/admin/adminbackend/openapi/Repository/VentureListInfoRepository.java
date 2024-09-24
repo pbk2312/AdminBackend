@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
+
 public interface VentureListInfoRepository extends JpaRepository<VentureListInfo,Long> {
 
     //VentureListInfo findByName(String name); //기업 정보 조회

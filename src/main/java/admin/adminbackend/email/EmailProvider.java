@@ -29,7 +29,7 @@ public class EmailProvider {
 
             messageHelper.setTo(email);
             messageHelper.setSubject(SUBJECT);
-            messageHelper.setText(htmlContent,true);
+            messageHelper.setText(htmlContent, true);
 
             javaMailSender.send(message);
 
@@ -101,4 +101,15 @@ public class EmailProvider {
         }
 
 
-    }}
+    }
+    public String createEmailSubject() {
+        return "[스타트업 투자 플랫폼] IR 자료";
+    }
+
+    public String createEmailBody(Long IRId) {
+        String readUrl = "http://localhost:8080/readIR?IRId=" + IRId;
+        return "안녕하세요,<br><br>첨부된 파일을 확인해 주세요.<br>" +
+                "IR 자료를 읽으시면 다음 링크를 클릭하여 자금투자계약서를 작성해주세요: <a href=\"" + readUrl + "\">" + readUrl + "</a>";
+    }
+
+}
