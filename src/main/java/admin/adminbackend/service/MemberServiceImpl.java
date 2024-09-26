@@ -1,7 +1,6 @@
 package admin.adminbackend.service;
 
 
-import admin.adminbackend.RedisService;
 import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.ResetToken;
@@ -14,7 +13,6 @@ import admin.adminbackend.dto.register.MemberChangePasswordDTO;
 import admin.adminbackend.dto.register.MemberRequestDTO;
 import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
-import admin.adminbackend.dto.token.TokenRequestDTO;
 import admin.adminbackend.email.EmailProvider;
 import admin.adminbackend.exception.*;
 import admin.adminbackend.repository.EmailRepository;
@@ -31,7 +29,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.Random;
 
 @Service
