@@ -2,6 +2,7 @@ package admin.adminbackend.controller;
 
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.ResetToken;
+import admin.adminbackend.dto.ResponseDTO;
 import admin.adminbackend.dto.WithdrawalMembershipDTO;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
@@ -114,23 +115,24 @@ public class MemberController {
 
 
     @GetMapping("/validateToken")
-    public ResponseEntity<Map<String, Object>> validateToken(
+    public ResponseEntity<ResponseDTO<Map<String, Object>>> validateToken(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @CookieValue(value = "refreshToken", required = false) String refreshToken,
             HttpServletResponse response) {
 
-        Map<String, Object> responseMap = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
 
         try {
             // Access Token 검증
             if (accessToken != null && tokenProvider.validate(accessToken)) {
-                responseMap.put("isLoggedIn", true);
-                return ResponseEntity.ok(responseMap);
+                Member member = memberService.getUserDetails(accessToken);
+                data.put("isLoggedIn", true);
+                data.put("memberRole", member.getMemberRole());
+                return ResponseEntity.ok(new ResponseDTO<>("Access token is valid", data));
             }
 
             // Access Token이 만료된 경우 Refresh Token 확인
             if (refreshToken != null && tokenProvider.validate(refreshToken)) {
-                // Redis에서 Refresh Token 확인
                 Member member = memberService.findByRefreshToken(refreshToken);
                 if (member != null) {
                     // 새 Access Token 발급
@@ -139,21 +141,19 @@ public class MemberController {
 
                     // 새 Access Token을 쿠키에 저장
                     addCookie(response, "accessToken", newTokenDTO.getAccessToken(), 3600); // 1시간 유효
-
-                    responseMap.put("isLoggedIn", true);
-                    responseMap.put("accessToken", newTokenDTO.getAccessToken());
-                    return ResponseEntity.ok(responseMap);
+                    data.put("memberRole",member.getMemberRole());
+                    data.put("isLoggedIn", true);
+                    data.put("accessToken", newTokenDTO.getAccessToken());
+                    return ResponseEntity.ok(new ResponseDTO<>("New access token issued", data));
                 }
             }
-
             // Refresh Token이 유효하지 않은 경우
-            responseMap.put("isLoggedIn", false);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
-
+            data.put("isLoggedIn", false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("Refresh token is invalid", data));
         } catch (Exception e) {
             log.error("토큰 검증 중 오류 발생", e);
-            responseMap.put("isLoggedIn", false);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
+            data.put("isLoggedIn", false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("Error occurred during token validation", data));
         }
     }
 
