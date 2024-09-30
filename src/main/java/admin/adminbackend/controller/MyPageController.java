@@ -57,7 +57,6 @@ public class MyPageController {
     @GetMapping("/memberInfo")
     public String memberInfo(
             @CookieValue(value = "accessToken", required = false) String accessToken,
-            HttpSession session,
             Model model
     ) {
         // Member 엔티티를 가져옵니다.
@@ -73,8 +72,6 @@ public class MyPageController {
         // 뷰를 반환합니다.
         return "mypage/memberInfo";
     }
-
-
 
 
 

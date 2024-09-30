@@ -17,7 +17,7 @@ public class IRNotification {
         private Long id;
 
         @ManyToOne
-        @JoinColumn(name = "member_id")
+        @JoinColumn(name = "ceo_id")
         @JsonIgnore  // 순환 참조 방지
         private Member ceo; // 수령인
 
@@ -27,7 +27,7 @@ public class IRNotification {
 
 
         @ManyToOne
-        @JoinColumn(name = "shipper_id")
+        @JoinColumn(name = "member_id")
         @JsonIgnore  // 순환 참조 방지
         private Member member; // 발송인
 }
