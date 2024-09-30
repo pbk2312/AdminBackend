@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -51,5 +52,10 @@ public class InvestmentService {
 
         // Investment 저장
         return investmentRepository.save(investment);
+    }
+
+    @Transactional
+    public List<Investment> getInvestmemtListfindByMemberId(Member member) {
+        return investmentRepository.findByMemberId(member.getId());
     }
 }
