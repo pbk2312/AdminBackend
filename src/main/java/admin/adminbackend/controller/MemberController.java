@@ -107,11 +107,11 @@ public class MemberController {
     }
 
     @PostMapping("/sendCertification")
-    public ResponseEntity<EmailResponseDTO> sendCertification(@RequestBody EmailRequestDTO emailRequestDTO) {
+    public ResponseEntity<String> sendCertification(@RequestBody EmailRequestDTO emailRequestDTO) {
         log.info("인증 메일 발송 요청이 들어왔습니다.");
-        EmailResponseDTO emailResponseDTO = memberService.sendCertificationMail(emailRequestDTO);
-        log.info("인증 메일이 발송되었습니다. 이메일: {}", emailResponseDTO.getEmail());
-        return ResponseEntity.ok(emailResponseDTO);
+        memberService.sendCertificationMail(emailRequestDTO);  // 인증 메일 발송 로직 수행
+        log.info("인증 메일이 발송되었습니다. 이메일: {}", emailRequestDTO.getEmail());
+        return ResponseEntity.ok("인증 메일이 성공적으로 발송되었습니다.");
     }
 
 

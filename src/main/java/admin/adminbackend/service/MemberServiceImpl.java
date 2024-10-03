@@ -4,6 +4,7 @@ package admin.adminbackend.service;
 import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.ResetToken;
+import admin.adminbackend.dto.MemberDTO;
 import admin.adminbackend.dto.WithdrawalMembershipDTO;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
@@ -75,6 +76,7 @@ public class MemberServiceImpl implements MemberService {
         emailRepository.delete(emailCertification);
 
         return MemberResponseDTO.of(savedMember);
+
     }
 
 
@@ -102,6 +104,7 @@ public class MemberServiceImpl implements MemberService {
         // 5. 토큰 발급
         log.info("로그인 완료: 사용자 아이디={}", authentication.getName());
         return tokenDTO;
+
     }
 
     // 로그아웃
@@ -252,6 +255,19 @@ public class MemberServiceImpl implements MemberService {
         }
         return sb.toString();
     }
+    @Transactional
+    public void updateMember(Member member, MemberDTO mypageMemberDTO) {
+        // 개인정보 수정
+        member.setName(mypageMemberDTO.getName());
+        member.setNickname(mypageMemberDTO.getNickname());
+        member.setPhoneNumber(mypageMemberDTO.getPhoneNumber());
+        member.setDateOfBirth(mypageMemberDTO.getDateOfBirth());
+        member.setAddress(mypageMemberDTO.getAddress());
+
+        // 저장 (업데이트)
+        memberRepository.save(member);
+    }
+
 
     // 임시 비밀번호 생성 메서드
     private String generateResetToken() {

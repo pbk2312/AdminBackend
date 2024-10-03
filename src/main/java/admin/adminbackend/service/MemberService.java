@@ -1,6 +1,7 @@
 package admin.adminbackend.service;
 
 import admin.adminbackend.domain.Member;
+import admin.adminbackend.dto.MemberDTO;
 import admin.adminbackend.dto.WithdrawalMembershipDTO;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
@@ -34,4 +35,5 @@ public interface MemberService {
     Member findByEmail(String email);
 
     Member findByRefreshToken(String refreshToken);
+    void updateMember(Member member, MemberDTO mypageMemberDTO);
 }

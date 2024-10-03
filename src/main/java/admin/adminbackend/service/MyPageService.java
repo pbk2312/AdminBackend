@@ -1,11 +1,8 @@
 package admin.adminbackend.service;
 
-import admin.adminbackend.domain.IRNotification;
 import admin.adminbackend.domain.Member;
-import admin.adminbackend.dto.myPage.IRNotificationDTO;
 
 import admin.adminbackend.dto.myPage.PasswordCheckDTO;
-import admin.adminbackend.repository.IRNotificationRepository;
 import admin.adminbackend.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +20,6 @@ public class MyPageService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final IRNotificationRepository irNotificationRepository;
 
     public boolean checkPassword(String userEmail, String passwordJson) {
         log.info("비밀번호 확인 요청 - 이메일: {}", userEmail);

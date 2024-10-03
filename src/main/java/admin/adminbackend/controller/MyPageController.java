@@ -3,14 +3,18 @@ package admin.adminbackend.controller;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.dto.MemberDTO;
 
+import admin.adminbackend.dto.ResponseDTO;
 import admin.adminbackend.service.MemberServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 
 @RestController
@@ -56,8 +60,45 @@ public class MyPageController {
         // 뷰를 반환합니다.
         return "mypage/memberInfo";
     }
+    // 개인정보 수정
+    @PostMapping("/editMemberInfoSubmit")
+    public ResponseEntity<ResponseDTO<Void>> editMemberInfoSubmit(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam("email") String email,
+            @RequestParam("name") String name,
+            @RequestParam("nickname") String nickname,
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam("dateOfBirth") String dateOfBirth,
+            @RequestParam("address") String address
+    ) {
+        if (accessToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("로그인이 필요합니다.", null));
+        }
 
+        try {
+            Member member = memberService.getUserDetails(accessToken);
+            if (member == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseDTO<>("회원 정보를 찾을 수 없습니다.", null));
+            }
+            LocalDate birth = LocalDate.parse(dateOfBirth); // String을 LocalDate로 변환
+            // LocalDate로 변환할 필요 없이 String으로 사용
+            MemberDTO mypageMemberDTO = new MemberDTO(
+                    email,
+                    name,
+                    nickname,
+                    phoneNumber,
+                    address,
+                    birth  // dateOfBirth는 String으로 사용
+            );
 
+            memberService.updateMember(member, mypageMemberDTO);
+
+            return ResponseEntity.ok(new ResponseDTO<>("회원 정보가 성공적으로 수정되었습니다.", null));
+        } catch (Exception e) {
+            log.error("회원 정보 수정 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO<>("회원 정보 수정 중 오류가 발생했습니다.", null));
+        }
+    }
 
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
