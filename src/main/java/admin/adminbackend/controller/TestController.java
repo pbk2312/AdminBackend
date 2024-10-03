@@ -4,7 +4,6 @@ package admin.adminbackend.controller;
 import admin.adminbackend.domain.Investment;
 import admin.adminbackend.dto.payment.PaymentDTO;
 import admin.adminbackend.repository.InvestmentRepository;
-import admin.adminbackend.service.MyPageService;
 import admin.adminbackend.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,7 +19,6 @@ public class TestController {
 
     private final InvestmentRepository investmentRepository;
     private final PaymentService paymentService;
-    private final MyPageService myPageService;
     @GetMapping("/testForm")
     public String test() {
         return "test";

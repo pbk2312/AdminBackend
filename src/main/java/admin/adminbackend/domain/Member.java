@@ -42,13 +42,12 @@ public class Member {
     // Member -> MemberDTO 변환 메소드
     public MemberDTO toMemberDTO() {
         return MemberDTO.builder()
-                .id(this.id)
                 .email(this.email)
                 .name(this.name)  // name 필드 추가
                 .nickname(this.nickname)  // nickname 필드 추가
                 .phoneNumber(this.phoneNumber)  // phoneNumber 필드 추가
                 .address(this.address)  // address 필드 추가
-                .dateOfBirth(this.dateOfBirth != null ? this.dateOfBirth.toString() : null)  // 생일 추가
+                .dateOfBirth(this.dateOfBirth)  // 생일 추가
                 .memberRole(this.memberRole != null ? this.memberRole.name() : null).build();
     }
 

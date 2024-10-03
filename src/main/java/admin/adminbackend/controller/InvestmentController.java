@@ -3,6 +3,7 @@ package admin.adminbackend.controller;
 import admin.adminbackend.domain.Investment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.dto.InvestmentDTO;
+import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.service.InvestmentService;
 import admin.adminbackend.service.MemberService;
 import lombok.Getter;
@@ -70,16 +71,14 @@ public class InvestmentController {
         }
 
         // 투자 내역을 DTO로 변환
-        List<InvestmentDTO> investmentDTOList = listInvestment.stream().map(investment -> {
-            InvestmentDTO investmentDTO = new InvestmentDTO();
-            investmentDTO.setId(investment.getId());
-            investmentDTO.setInvestmentUid(investment.getInvestmentUid());
-            investmentDTO.setMemberId(investment.getInvestor().getId());
-            investmentDTO.setPaymentId(investment.getPayment().getId());
-            investmentDTO.setAmount(investment.getAmount());
-            investmentDTO.setVentureId(investment.getVentureListInfo().getId());
-            investmentDTO.setInvestedAt(investment.getInvestedAt());
-            return investmentDTO;
+        List<InvestmentHistoryDTO> investmentDTOList = listInvestment.stream().map(investment -> {
+            InvestmentHistoryDTO investmentHistoryDTO = new InvestmentHistoryDTO();
+           investmentHistoryDTO.setInvestmentUid(investment.getInvestmentUid());
+           investmentHistoryDTO.setAmount(investment.getAmount());
+           investmentHistoryDTO.setInvestedAt(investment.getInvestedAt());
+           investmentHistoryDTO.setMemberName(member.getName());
+           investmentHistoryDTO.setVentureName(investment.getVentureListInfo().getName());
+           return investmentHistoryDTO;
         }).collect(Collectors.toList());
 
         // 성공적으로 조회한 투자 내역 DTO 반환
