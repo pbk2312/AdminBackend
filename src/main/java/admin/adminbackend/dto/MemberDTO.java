@@ -19,12 +19,5 @@ public class MemberDTO {
     private LocalDate dateOfBirth; // 생일 추가 (String으로 변환)
     private String memberRole;
 
-    public MemberDTO(String email, String name, String nickname, String phoneNumber, String address, LocalDate dateOfBirth) {
-        this.email = email;
-        this.name = name;
-        this.nickname = nickname;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
-        this.dateOfBirth = dateOfBirth;
-    }
+
 }

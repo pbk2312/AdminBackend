@@ -82,14 +82,14 @@ public class MyPageController {
             }
             LocalDate birth = LocalDate.parse(dateOfBirth); // String을 LocalDate로 변환
             // LocalDate로 변환할 필요 없이 String으로 사용
-            MemberDTO mypageMemberDTO = new MemberDTO(
-                    email,
-                    name,
-                    nickname,
-                    phoneNumber,
-                    address,
-                    birth  // dateOfBirth는 String으로 사용
-            );
+            MemberDTO mypageMemberDTO = MemberDTO.builder()
+                    .email(email)
+                    .name(name)
+                    .nickname(nickname)
+                    .phoneNumber(phoneNumber)
+                    .address(address)
+                    .dateOfBirth(birth) // String을 LocalDate로 변환
+                    .build();
 
             memberService.updateMember(member, mypageMemberDTO);
 
