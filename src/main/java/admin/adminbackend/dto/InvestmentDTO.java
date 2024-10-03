@@ -18,5 +18,4 @@ public class InvestmentDTO {
     private Long ventureId; // 벤처 기업 ID
     private LocalDateTime investedAt; // 투자 시각
 
-    // 필요시 추가 생성자, 메소드
 }

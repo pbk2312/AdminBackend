@@ -42,12 +42,13 @@ public class MemberController {
     private final ResetTokenRepository resetTokenRepository;
     private final TokenProvider tokenProvider;
 
+
     @PostMapping("/register")
-    public ResponseEntity<MemberResponseDTO> register(@RequestBody MemberRequestDTO memberRequestDTO) {
+    public ResponseEntity<String> register(@RequestBody MemberRequestDTO memberRequestDTO) {
         log.info("회원 가입 요청이 들어왔습니다.");
-        MemberResponseDTO responseDTO = memberService.register(memberRequestDTO);
-        log.info("회원 가입이 완료되었습니다. 회원 ID: {}", responseDTO.getEmail());
-        return ResponseEntity.ok(responseDTO);
+        memberService.register(memberRequestDTO);  // 회원 가입 로직 수행
+        log.info("회원 가입이 완료되었습니다. 회원 Email: {}", memberRequestDTO.getEmail());
+        return ResponseEntity.ok("회원가입이 성공적으로 완료되었습니다.");
     }
 
     // 로그인
