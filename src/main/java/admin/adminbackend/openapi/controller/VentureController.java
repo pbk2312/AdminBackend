@@ -1,7 +1,9 @@
 package admin.adminbackend.openapi.controller;
 
+import admin.adminbackend.domain.Member;
 import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.openapi.service.VentureService;
+import admin.adminbackend.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -22,6 +24,7 @@ import java.util.Map;
 public class VentureController {
 
     private final VentureService ventureService;
+    private final MemberService memberService;
 
     /*@PostMapping("/ventures/new")
     public ResponseEntity<Long> saveVenture(@RequestBody VentureListInfoForm form) throws IOException {
@@ -47,17 +50,19 @@ public class VentureController {
             @RequestParam("ventureNumber") String ventureNumber,
             @RequestParam("mainProduct") String mainProduct,
             @RequestParam("typeName") String typeName,
-            @RequestPart("file") MultipartFile file
+            @RequestPart("file") MultipartFile file,
+            @CookieValue(value = "accessToken", required = false) String accessToken
     ) throws IOException {
         log.info("새 벤처 저장 요청 시작");
 
+        Member member = memberService.getUserDetails(accessToken);
         // 입력된 form 데이터와 파일의 기본 정보 로깅
         log.info("Received data: name={}, owner={}, ventureNumber={}, mainProduct={}, typeName={}", name, owner, ventureNumber, mainProduct, typeName);
         log.info("Received file: name={}, size={} bytes, contentType={}", file.getOriginalFilename(), file.getSize(), file.getContentType());
 
         //VentureListInfoForm form = new VentureListInfoForm(name, owner, ventureNumber, mainProduct, typeName);
         VentureListInfoForm form = new VentureListInfoForm(mainProduct, typeName, name, owner, ventureNumber);
-        Long ventureId = ventureService.saveVenture(form, file);
+        Long ventureId = ventureService.saveVenture(form, file,member);
 
         // 벤처 ID 생성 후 로깅
         log.info("Venture saved with ID: {}", ventureId);

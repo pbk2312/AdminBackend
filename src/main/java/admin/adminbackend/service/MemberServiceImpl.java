@@ -262,7 +262,6 @@ public class MemberServiceImpl implements MemberService {
         member.setNickname(mypageMemberDTO.getNickname());
         member.setPhoneNumber(mypageMemberDTO.getPhoneNumber());
         member.setDateOfBirth(mypageMemberDTO.getDateOfBirth());
-        member.setAddress(mypageMemberDTO.getAddress());
 
         // 저장 (업데이트)
         memberRepository.save(member);

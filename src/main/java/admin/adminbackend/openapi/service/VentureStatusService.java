@@ -1,5 +1,6 @@
 package admin.adminbackend.openapi.service;
 
+import admin.adminbackend.domain.Member;
 import admin.adminbackend.openapi.controller.VentureStatusController;
 import admin.adminbackend.openapi.service.UtilService.UtilService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,7 @@ import java.util.List;
 @Service
 @Slf4j
 public class VentureStatusService {
-    public static JSONObject getCompanyNum(@org.springframework.web.bind.annotation.RequestBody String b_no) {
+    public static JSONObject getCompanyNum(@org.springframework.web.bind.annotation.RequestBody String b_no, Member member) {
         //okhttp3으로 통신
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("application/json");
@@ -51,6 +52,10 @@ public class VentureStatusService {
                 // b_stt만 포함된 JSON 응답 생성
                 JSONObject result = new JSONObject();
                 result.put("b_stt", b_stt);
+
+                // 여기다가 기업 승급
+
+
                 return result;
 
             } else {

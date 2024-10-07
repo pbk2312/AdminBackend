@@ -1,7 +1,7 @@
 package admin.adminbackend.openapi.service;
 
+import admin.adminbackend.domain.Member;
 import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
-import admin.adminbackend.openapi.Repository.VentureRepository;
 import admin.adminbackend.openapi.domain.UploadFile;
 import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.openapi.domain.VentureListInfoForm;
@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class VentureService {
 
-    private final VentureRepository ventureRepository;
     public final VentureListInfoRepository ventureListInfoRepository;
     private final FileStore fileStore;
     private final VentureStatusService ventureStatusService;
@@ -51,7 +50,7 @@ public class VentureService {
         Venture savedVenture = ventureRepository.save(venture);*/
 
 
-        // 2. VentureListInfo 테이블에 저장
+    // 2. VentureListInfo 테이블에 저장
         /*VentureListInfo ventureListInfo = new VentureListInfo();
 
         ventureListInfo.setCode(form.getCode());
@@ -76,12 +75,12 @@ public class VentureService {
         return savedVentureListInfo.getId();
     }*/
 
-    public Long saveVenture(VentureListInfoForm form, MultipartFile file) throws IOException {
+    public Long saveVenture(VentureListInfoForm form, MultipartFile file, Member member) throws IOException {
         // 파일을 저장하고, 저장된 파일의 정보(예: 파일 경로, 이름 등)를 얻기
         UploadFile attachFile = fileStore.storeFile(file);
 
         // 기업 상태를 조회
-        JSONObject ventureStatus = ventureStatusService.getCompanyNum(form.getVentureNumber());
+        JSONObject ventureStatus = ventureStatusService.getCompanyNum(form.getVentureNumber(),member);
         if (ventureStatus != null) {
             form.setB_stt((String) ventureStatus.get("b_stt"));
         }

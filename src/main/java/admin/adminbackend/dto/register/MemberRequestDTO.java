@@ -53,7 +53,6 @@ public class MemberRequestDTO {
                 .name(name)  // 이름 추가
                 .nickname(nickname)  // 닉네임 추가
                 .phoneNumber(phoneNumber)  // 전화번호 추가
-                .address(address)  // 주소 추가
                 .dateOfBirth(dateOfBirth)  // 생일 추가
                 .build();
     }

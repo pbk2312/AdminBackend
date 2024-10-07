@@ -36,7 +36,6 @@ public class Member {
     private String name;
     private String nickname;  // 닉네임 필드 추가
     private String phoneNumber;
-    private String address;
     private LocalDate dateOfBirth;  // 생일 필드를 LocalDate로 수정
 
     // Member -> MemberDTO 변환 메소드
@@ -46,7 +45,6 @@ public class Member {
                 .name(this.name)  // name 필드 추가
                 .nickname(this.nickname)  // nickname 필드 추가
                 .phoneNumber(this.phoneNumber)  // phoneNumber 필드 추가
-                .address(this.address)  // address 필드 추가
                 .dateOfBirth(this.dateOfBirth)  // 생일 추가
                 .memberRole(this.memberRole != null ? this.memberRole.name() : null).build();
     }
