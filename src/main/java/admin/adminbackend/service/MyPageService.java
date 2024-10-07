@@ -3,21 +3,17 @@ package admin.adminbackend.service;
 import admin.adminbackend.domain.IRNotification;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.dto.myPage.IRNotificationDTO;
-import admin.adminbackend.dto.myPage.MyPageRequestDTO;
-import admin.adminbackend.dto.myPage.PasswordChangeDTO;
+
 import admin.adminbackend.dto.myPage.PasswordCheckDTO;
 import admin.adminbackend.repository.IRNotificationRepository;
 import admin.adminbackend.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hamcrest.Condition;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -106,64 +102,4 @@ public class MyPageService {
         return optionalMember.get();
     }
 
-    @Transactional
-    public boolean IRSend(Member venture, Member person) {
-        try {
-            // IRNotification 생성 및 저장 로직
-            IRNotification notification = new IRNotification();
-            notification.setVenture(venture);
-            notification.setPerson(person);
-            notification.setRead(false); // 기본적으로 읽지 않은 상태로 설정
-            // Save notification to the repository
-            irNotificationRepository.save(notification);
-            return true; // 성공
-        } catch (Exception e) {
-            // 예외 처리 및 로그 기록
-            e.printStackTrace();
-            return false; // 실패
-        }
-    }
-
-
-
-    @Transactional(readOnly = true)
-    public List<IRNotificationDTO> findIRList(Member venture) {
-        if (venture == null) {
-            throw new IllegalArgumentException("Member cannot be null");
-        }
-
-        log.info("Finding IR notifications for member: {}", venture);
-
-        // IR 알림 리스트를 조회
-        List<IRNotification> irList = irNotificationRepository.findByVentureAndIsReadFalse(venture);
-        log.info("Found {} IR notifications", irList.size());
-
-        // DTO로 변환
-        return irList.stream().map(ir -> {
-            Member ventureMember = ir.getVenture();
-            Member personMember = ir.getPerson();
-            return new IRNotificationDTO(
-                    ir.getId(),
-                    ventureMember != null ? ventureMember.getId() : null,
-                    ventureMember != null ? ventureMember.getEmail() : null,
-                    personMember != null ? personMember.getId() : null,
-                    personMember != null ? personMember.getEmail() : null,
-                    ir.isRead(),
-                    ir.getCreatedAt()
-            );
-        }).collect(Collectors.toList());
-    }
-
-
-    @Transactional
-    public IRNotification findIRSendMember(Long IRNotificationId){
-        IRNotification irNotification = irNotificationRepository.findById(IRNotificationId).orElseThrow(() -> new RuntimeException("IR이 없다"));
-        return irNotification;
-    }
-
-    // IRNotification 저장 메서드
-    @Transactional
-    public void saveIRNotification(IRNotification irNotification) {
-        irNotificationRepository.save(irNotification);
-    }
 }

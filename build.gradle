@@ -79,6 +79,8 @@ dependencies {
     // iText PDF 라이브러리
     implementation 'com.itextpdf:itext7-core:7.1.16'
 
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 }
 
 tasks.named('test') {

@@ -33,6 +33,7 @@ public class Member {
     @OneToMany(mappedBy = "investor")
     private List<Investment> investments; // 투자 내역
 
+    // 병합된 부분: 필드들 통합
     private String name;
     private String nickname;  // 닉네임 필드 추가
     private String phoneNumber;
@@ -47,9 +48,7 @@ public class Member {
                 .name(this.name)  // name 필드 추가
                 .nickname(this.nickname)  // nickname 필드 추가
                 .phoneNumber(this.phoneNumber)  // phoneNumber 필드 추가
-                .address(this.address)  // address 필드 추가
                 .dateOfBirth(this.dateOfBirth != null ? this.dateOfBirth.toString() : null)  // 생일 추가
                 .memberRole(this.memberRole != null ? this.memberRole.name() : null).build();
     }
-
 }

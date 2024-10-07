@@ -1,77 +1,50 @@
 package admin.adminbackend.controller;
 
+import admin.adminbackend.domain.IRNotification;
 import admin.adminbackend.domain.Member;
+import admin.adminbackend.dto.myPage.IRNotificationDTO;
+import admin.adminbackend.email.EmailProvider;
 import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.openapi.service.VentureListService;
-import admin.adminbackend.service.MyPageService;
-import admin.adminbackend.jwt.TokenProvider;
+import admin.adminbackend.service.IRService;
+import admin.adminbackend.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Collections;
+import java.util.List;
+
 
 @RestController
 @Log4j2
 @RequiredArgsConstructor
-@RequestMapping("/venture")
 public class IRController {
 
     private final VentureListService ventureListInfoService;
-    private final MyPageService myPageService;
-    private final TokenProvider tokenProvider;
+    private final MemberService memberService;
+    private final IRService irService;
+    private final EmailProvider emailProvider;
 
-    // 쿠키에서 accessToken을 추출해 사용자 인증 정보를 가져오는 메서드
-    private UserDetails getUserDetailsFromToken(HttpServletRequest request) {
-        String accessToken = null;
-
-        // 쿠키에서 accessToken 추출
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("accessToken".equals(cookie.getName())) {
-                    accessToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        // 토큰이 유효한지 확인하고, 유효하다면 사용자 정보를 반환
-        if (accessToken != null && tokenProvider.validate(accessToken)) {
-            Authentication authentication = tokenProvider.getAuthentication(accessToken);
-            return (UserDetails) authentication.getPrincipal();
-        }
-
-        return null;  // 유효하지 않은 경우 null 반환
-    }
 
     // IR 보내기
-    @PostMapping("/info")
+    @PostMapping("/IRSend")
     public ResponseEntity<String> sendIR(
-            HttpServletRequest request,
+            @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestParam("id") Long ventureId
     ) {
         try {
+            log.info("IR 요청");
             // 쿠키에서 인증 정보 가져오기
-            UserDetails userDetails = getUserDetailsFromToken(request);
-
-            if (userDetails == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 정보를 가져올 수 없습니다.");
-            }
-
-            log.info("ventureId = {}", ventureId);
+            Member member = memberService.getUserDetails(accessToken);
             VentureListInfo ventureInfo = ventureListInfoService.getCompanyById(ventureId);
-            Member member = ventureInfo.getMember();
-            Member shipper = myPageService.getMemberInfo(userDetails.getUsername());
 
-            boolean success = myPageService.IRSend(member, shipper);
+            Member CEO = ventureInfo.getMember(); // 대표님
+            boolean success = irService.IRSend(CEO, member);
 
             if (success) {
                 return ResponseEntity.ok("IR 요청 성공");
@@ -84,4 +57,72 @@ public class IRController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("IR 요청 실패");
         }
     }
+
+    @GetMapping("/IRCheck")
+    public ResponseEntity<?> IRCheck(
+            @CookieValue(value = "accessToken", required = false) String accessToken) {
+
+        // ceo가 IR 달라고 요청한 멤버들이 있는지 확인
+
+        Member ceo = memberService.getUserDetails(accessToken);
+
+        try {
+            // 멤버를 기반으로 IRNotification 리스트 조회 및 DTO로 변환
+            List<IRNotificationDTO> irNotificationDTOList = irService.findIRList(ceo);
+
+            if (irNotificationDTOList.isEmpty()) {
+                log.info("멤버 {}의 IR 리스트가 비어 있습니다.", ceo);
+                return ResponseEntity.ok(Collections.emptyList());
+            }
+
+            log.info("멤버 {}의 IR 리스트를 반환합니다. 총 {} 건", ceo, irNotificationDTOList.size());
+            return ResponseEntity.ok(irNotificationDTOList);
+        } catch (Exception e) {
+            log.error("IR 조회 중 오류 발생: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("IR 알림 조회 중 오류가 발생했습니다.");
+        }
+    }
+
+    @PostMapping("/sendIR")
+    public ResponseEntity<String> sendIR(@CookieValue(value = "accessToken", required = false) String accessToken,
+                                         @RequestParam("IRId") Long IRId,
+                                         @RequestParam("file") MultipartFile file) {
+        Member ceo = memberService.getUserDetails(accessToken);
+        log.info("IR 전송 멤버: {}", ceo);
+
+        IRNotification irNotification = irService.findIRSendMember(IRId);
+        Member getPerson = irNotification.getMember();
+
+        String subject = emailProvider.createEmailSubject();
+        String body = emailProvider.createEmailBody(IRId);
+
+        boolean result = emailProvider.sendFileEmail(getPerson.getEmail(), subject, body, file);
+
+        if (result) {
+            return ResponseEntity.ok("이메일 전송 성공");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패");
+        }
+    }
+
+    @GetMapping("/readIR")
+    public ResponseEntity<String> readIR(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @RequestParam("IRId") Long IRId) {
+
+        Member member = memberService.getUserDetails(accessToken);
+
+        IRNotification irNotification = irService.findIRSendMember(IRId);
+
+        if (irNotification != null) {
+            irNotification.setRead(true);
+            irService.saveIRNotification(irNotification);
+            return ResponseEntity.ok("IR 자료를 읽었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("IR 자료를 찾을 수 없습니다.");
+        }
+    }
+
+
 }
