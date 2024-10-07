@@ -1,7 +1,6 @@
 package admin.adminbackend.openapi.service;
 
 import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
-import admin.adminbackend.openapi.Repository.VentureRepository;
 import admin.adminbackend.openapi.domain.UploadFile;
 import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.openapi.domain.VentureListInfoForm;
@@ -27,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class VentureService {
 
-    private final VentureRepository ventureRepository;
     public final VentureListInfoRepository ventureListInfoRepository;
     private final FileStore fileStore;
     private final VentureStatusService ventureStatusService;

@@ -7,10 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
+import java.time.LocalDate;
 
 @Getter
 @AllArgsConstructor
@@ -25,29 +24,34 @@ public class MemberRequestDTO {
     private String password;
 
     @NotBlank
-    private MemberRole memberRole;
+    private String certificationNumber; // 인증번호 필드
 
     @NotBlank
-    private String certificationNumber; // 추가: 인증번호 필드
+    private String name;  // 이름 추가
+
+    @NotBlank
+    private String nickname;  // 닉네임 추가
+
+    @NotBlank
+    private String phoneNumber;  // 전화번호 추가
+
+    @NotBlank
+    private String address;  // 주소 추가
+
+    private LocalDate dateOfBirth;  // 생일 추가
 
     public Member toMember(PasswordEncoder passwordEncoder) {
         // 회원 객체를 생성하고 반환
         return Member.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
-                .memberRole(memberRole)
+                .memberRole(MemberRole.MEMBER)
+                .name(name)  // 이름 추가
+                .nickname(nickname)  // 닉네임 추가
+                .phoneNumber(phoneNumber)  // 전화번호 추가
+                .address(address)  // 주소 추가
+                .dateOfBirth(dateOfBirth)  // 생일 추가
                 .build();
     }
-
-    public UsernamePasswordAuthenticationToken toAuthentication() {
-        return new UsernamePasswordAuthenticationToken(email, password);
-        // 사용자 로그인 기능 처리하기 위한 메서드
-    }
-
-    // 추가: 인증번호를 DTO에 포함시키는 메서드
-    public void setCertificationNumber(String certificationNumber) {
-        this.certificationNumber = certificationNumber;
-    }
-
 
 }

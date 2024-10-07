@@ -3,11 +3,11 @@ package admin.adminbackend.openapi.service;
 import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
 import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.openapi.exception.CompanyNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,11 +20,11 @@ import java.net.URL;
 
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class VentureListService {
 
-    @Autowired
-    private VentureListInfoRepository ventureListInfoRepository;
 
+    private final VentureListInfoRepository ventureListInfoRepository;
     @Transactional
     public JSONArray callApi(int page) {
         JSONArray result = new JSONArray();
@@ -67,7 +67,8 @@ public class VentureListService {
 
                     VentureListInfo infoObj = new VentureListInfo(code, mainProduct, area, address,
                             registInstitution, endDate, registType, typeName, typeName_spc,
-                            name, id, owner, startDate);
+                            name, id, owner, startDate, null, null, null,
+                            null, null, null);
 
                     if (!ventureListInfoRepository.existsById(id)) {
                         ventureListInfoRepository.save(infoObj);

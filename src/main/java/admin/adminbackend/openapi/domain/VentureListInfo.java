@@ -41,9 +41,26 @@ public class VentureListInfo {
     public VentureListInfo() {
     }
 
-    public VentureListInfo(String code, String mainProduct, String area, String address,
-                           String registInstitution, String endDate, String registType, String typeName, String typeNameSpc,
-                           String name, Long id, String owner, String startDate) {
+    public VentureListInfo(String code, String mainProduct, String area, String address, String registInstitution, String endDate, String registType, String typeName, String typeName_spc, String name, Long id, String owner, String startDate, String ventureNumber, UploadFile attachFile, String b_stt, VentureApplyStatus ventureApplyStatus, Member member, List<Investment> investments) {
+        this.code = code;
+        this.mainProduct = mainProduct;
+        this.area = area;
+        this.address = address;
+        this.registInstitution = registInstitution;
+        this.endDate = endDate;
+        this.registType = registType;
+        this.typeName = typeName;
+        this.typeName_spc = typeName_spc;
+        this.name = name;
+        this.id = id;
+        this.owner = owner;
+        this.startDate = startDate;
+        this.ventureNumber = ventureNumber;
+        this.attachFile = attachFile;
+        this.b_stt = b_stt;
+        this.ventureApplyStatus = ventureApplyStatus;
+        this.member = member;
+        this.investments = investments;
     }
 
     @OneToOne
@@ -55,5 +72,5 @@ public class VentureListInfo {
     private List<Investment> investments; // List to hold investments related to this VentureListInfo
 
 
-
 }
+
