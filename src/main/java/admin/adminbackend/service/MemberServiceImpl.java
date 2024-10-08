@@ -1,10 +1,16 @@
 package admin.adminbackend.service;
 
 
+import admin.adminbackend.RedisService;
 import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
+<<<<<<< HEAD
 import admin.adminbackend.domain.ResetToken;
 import admin.adminbackend.dto.MemberDTO;
+=======
+import admin.adminbackend.domain.MemberRole;
+import admin.adminbackend.domain.ResetToken;
+>>>>>>> origin/master
 import admin.adminbackend.dto.WithdrawalMembershipDTO;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
@@ -16,6 +22,11 @@ import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
 import admin.adminbackend.email.EmailProvider;
 import admin.adminbackend.exception.*;
+<<<<<<< HEAD
+=======
+import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
+import admin.adminbackend.openapi.domain.VentureListInfo;
+>>>>>>> origin/master
 import admin.adminbackend.repository.EmailRepository;
 import admin.adminbackend.repository.MemberRepository;
 import admin.adminbackend.jwt.TokenProvider;
@@ -46,10 +57,17 @@ public class MemberServiceImpl implements MemberService {
     private final EmailProvider emailProvider;
     private final EmailRepository emailRepository;
     private final ResetTokenRepository resetTokenRepository;
+    private final VentureListInfoRepository ventureListInfoRepository;
 
 
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
 
+<<<<<<< HEAD
+
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
+
+=======
+>>>>>>> origin/master
     // 회원가입
     @Transactional
     @Override
@@ -105,8 +123,11 @@ public class MemberServiceImpl implements MemberService {
         log.info("로그인 완료: 사용자 아이디={}", authentication.getName());
         return tokenDTO;
 
+<<<<<<< HEAD
     }
 
+=======
+>>>>>>> origin/master
     // 로그아웃
     @Transactional
     public void logout(LogoutDTO logoutDTO) {
@@ -232,12 +253,39 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
+<<<<<<< HEAD
     public void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new IncorrectPasswordException("비밀번호가 일치하지 않습니다.");
         }
     }
 
+=======
+    public void registerMemberWithVenture(Member member) {
+        // 1. Member 테이블에 회원 정보 저장
+        Member savedMember = memberRepository.save(member);
+
+        // 2. 만약 회원의 역할이 VENTURE라면 VentureListInfo도 생성 및 저장
+        if (member.getMemberRole() == MemberRole.VENTURE) {
+            VentureListInfo ventureListInfo = new VentureListInfo();
+            ventureListInfo.setMember(savedMember); // Member와 연결
+            ventureListInfoRepository.save(ventureListInfo);
+            log.info("Venture information saved for member ID: {}", savedMember.getId());
+        }
+    }
+    public Member getMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElse(null); // 존재하지 않으면 null 반환
+    }
+
+
+    public void validatePassword(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new IncorrectPasswordException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+>>>>>>> origin/master
 
     private boolean isInvalidToken(String accessToken) {
         return accessToken == null || !tokenProvider.validate(accessToken);
@@ -280,4 +328,8 @@ public class MemberServiceImpl implements MemberService {
         return sb.toString();
     }
 
+    @Override
+    public Member saveMember(Member member) {
+        return null;
+    }
 }

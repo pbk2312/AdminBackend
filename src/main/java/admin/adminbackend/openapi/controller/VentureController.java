@@ -4,9 +4,13 @@ import admin.adminbackend.domain.Member;
 import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.openapi.service.VentureService;
 import admin.adminbackend.service.MemberService;
+import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
+
+import admin.adminbackend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +30,8 @@ public class VentureController {
 
     private final VentureService ventureService;
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
+    private final VentureListInfoRepository ventureListInfoRepository;
 
     /*@PostMapping("/ventures/new")
     public ResponseEntity<Long> saveVenture(@RequestBody VentureListInfoForm form) throws IOException {
@@ -74,6 +81,7 @@ public class VentureController {
 
         return ResponseEntity.ok(response);
     }
+
     @GetMapping("/ventures/{id}")
     public ResponseEntity<VentureListInfo> ventures(@PathVariable Long id) {
         VentureListInfo ventureListInfo = ventureService.getVentureById(id);

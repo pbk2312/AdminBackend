@@ -6,7 +6,6 @@ import admin.adminbackend.dto.InvestmentDTO;
 import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.service.InvestmentService;
 import admin.adminbackend.service.MemberService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -15,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,14 +27,11 @@ public class InvestmentController {
     private final MemberService memberService;
 
 
-
-    // 투자
     @PostMapping("/createInvest")
     public ResponseEntity<?> createInvestment(
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestBody InvestmentDTO investmentDTO) {
 
-        // AccessToken을 이용해 사용자 정보 조회
         Member member = memberService.getUserDetails(accessToken);
 
         // Investment 생성
@@ -73,12 +72,12 @@ public class InvestmentController {
         // 투자 내역을 DTO로 변환
         List<InvestmentHistoryDTO> investmentDTOList = listInvestment.stream().map(investment -> {
             InvestmentHistoryDTO investmentHistoryDTO = new InvestmentHistoryDTO();
-           investmentHistoryDTO.setInvestmentUid(investment.getInvestmentUid());
-           investmentHistoryDTO.setAmount(investment.getAmount());
-           investmentHistoryDTO.setInvestedAt(investment.getInvestedAt());
-           investmentHistoryDTO.setMemberName(member.getName());
-           investmentHistoryDTO.setVentureName(investment.getVentureListInfo().getName());
-           return investmentHistoryDTO;
+            investmentHistoryDTO.setInvestmentUid(investment.getInvestmentUid());
+            investmentHistoryDTO.setAmount(investment.getAmount());
+            investmentHistoryDTO.setInvestedAt(investment.getInvestedAt());
+            investmentHistoryDTO.setMemberName(member.getName());
+            investmentHistoryDTO.setVentureName(investment.getVentureListInfo().getName());
+            return investmentHistoryDTO;
         }).collect(Collectors.toList());
 
         // 성공적으로 조회한 투자 내역 DTO 반환

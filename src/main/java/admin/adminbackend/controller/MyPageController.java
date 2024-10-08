@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/mypage")
@@ -45,6 +46,7 @@ public class MyPageController {
     @GetMapping("/memberInfo")
     public String memberInfo(
             @CookieValue(value = "accessToken", required = false) String accessToken,
+            HttpSession session,
             Model model
     ) {
         // Member 엔티티를 가져옵니다.
@@ -99,7 +101,6 @@ public class MyPageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO<>("회원 정보 수정 중 오류가 발생했습니다.", null));
         }
     }
-
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");

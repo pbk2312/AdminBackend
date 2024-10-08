@@ -22,7 +22,7 @@ public class VentureListController {
 
     @GetMapping("/list")
     @ResponseBody
-    public JSONArray callApi(int page) {
+    public JSONArray callApi(Integer page) {
         return ventureListService.callApi(page);
     }
 

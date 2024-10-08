@@ -6,3 +6,4 @@ public enum MemberRole {
     MEMBER,
     ADMIN
 }
+
