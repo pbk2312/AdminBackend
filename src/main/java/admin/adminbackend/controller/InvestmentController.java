@@ -50,6 +50,7 @@ public class InvestmentController {
         responseDTO.setVentureId(investmentDTO.getVentureId());
         responseDTO.setAmount(investmentDTO.getAmount());
         responseDTO.setInvestedAt(investment.getInvestedAt());
+        responseDTO.setPaymentId(investment.getPayment().getId());
 
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }

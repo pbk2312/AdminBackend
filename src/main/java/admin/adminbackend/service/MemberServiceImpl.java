@@ -1,16 +1,11 @@
 package admin.adminbackend.service;
 
 
-import admin.adminbackend.RedisService;
 import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
-<<<<<<< HEAD
 import admin.adminbackend.domain.ResetToken;
 import admin.adminbackend.dto.MemberDTO;
-=======
 import admin.adminbackend.domain.MemberRole;
-import admin.adminbackend.domain.ResetToken;
->>>>>>> origin/master
 import admin.adminbackend.dto.WithdrawalMembershipDTO;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
@@ -22,11 +17,8 @@ import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
 import admin.adminbackend.email.EmailProvider;
 import admin.adminbackend.exception.*;
-<<<<<<< HEAD
-=======
 import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
 import admin.adminbackend.openapi.domain.VentureListInfo;
->>>>>>> origin/master
 import admin.adminbackend.repository.EmailRepository;
 import admin.adminbackend.repository.MemberRepository;
 import admin.adminbackend.jwt.TokenProvider;
@@ -62,12 +54,7 @@ public class MemberServiceImpl implements MemberService {
 
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
 
-<<<<<<< HEAD
 
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
-
-=======
->>>>>>> origin/master
     // 회원가입
     @Transactional
     @Override
@@ -122,12 +109,7 @@ public class MemberServiceImpl implements MemberService {
         // 5. 토큰 발급
         log.info("로그인 완료: 사용자 아이디={}", authentication.getName());
         return tokenDTO;
-
-<<<<<<< HEAD
     }
-
-=======
->>>>>>> origin/master
     // 로그아웃
     @Transactional
     public void logout(LogoutDTO logoutDTO) {
@@ -253,14 +235,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
-<<<<<<< HEAD
-    public void validatePassword(String rawPassword, String encodedPassword) {
-        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new IncorrectPasswordException("비밀번호가 일치하지 않습니다.");
-        }
-    }
 
-=======
     public void registerMemberWithVenture(Member member) {
         // 1. Member 테이블에 회원 정보 저장
         Member savedMember = memberRepository.save(member);
@@ -285,7 +260,6 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
->>>>>>> origin/master
 
     private boolean isInvalidToken(String accessToken) {
         return accessToken == null || !tokenProvider.validate(accessToken);
@@ -307,7 +281,6 @@ public class MemberServiceImpl implements MemberService {
     public void updateMember(Member member, MemberDTO mypageMemberDTO) {
         // 개인정보 수정
         member.setName(mypageMemberDTO.getName());
-        member.setNickname(mypageMemberDTO.getNickname());
         member.setPhoneNumber(mypageMemberDTO.getPhoneNumber());
         member.setDateOfBirth(mypageMemberDTO.getDateOfBirth());
 

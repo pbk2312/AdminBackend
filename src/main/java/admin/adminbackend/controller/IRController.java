@@ -31,7 +31,7 @@ public class IRController {
     private final EmailProvider emailProvider;
 
 
-    // IR 보내기
+    // IR 요청 보내기
     @PostMapping("/IRSend")
     public ResponseEntity<String> sendIR(
             @CookieValue(value = "accessToken", required = false) String accessToken,
@@ -44,7 +44,7 @@ public class IRController {
             VentureListInfo ventureInfo = ventureListInfoService.getCompanyById(ventureId);
 
             Member CEO = ventureInfo.getMember(); // 대표님
-            boolean success = irService.IRSend(CEO, member);
+            boolean success = irService.IRSend(CEO, member,ventureInfo);
 
             if (success) {
                 return ResponseEntity.ok("IR 요청 성공");
@@ -63,7 +63,6 @@ public class IRController {
             @CookieValue(value = "accessToken", required = false) String accessToken) {
 
         // ceo가 IR 달라고 요청한 멤버들이 있는지 확인
-
         Member ceo = memberService.getUserDetails(accessToken);
 
         try {
@@ -84,6 +83,34 @@ public class IRController {
         }
     }
 
+
+    @GetMapping("/IRSendCheck")
+    public ResponseEntity<?> sendIRCheck(@CookieValue(value = "accessToken", required = false) String accessToken){
+
+        Member member = memberService.getUserDetails(accessToken);
+
+        try {
+            // 멤버를 기반으로 IRNotification 리스트 조회 및 DTO로 변환
+            List<IRNotificationDTO> irNotificationDTOList = irService.findIRMemberList(member);
+
+            if (irNotificationDTOList.isEmpty()) {
+                log.info("멤버 {}의 IR 리스트가 비어 있습니다.", member);
+                return ResponseEntity.ok(Collections.emptyList());
+            }
+
+            log.info("멤버 {}의 IR 리스트를 반환합니다. 총 {} 건", member, irNotificationDTOList.size());
+            return ResponseEntity.ok(irNotificationDTOList);
+        } catch (Exception e) {
+            log.error("IR 조회 중 오류 발생: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("IR 알림 조회 중 오류가 발생했습니다.");
+        }
+
+    }
+
+
+
+    // 마이페이지에서 IR 전송
     @PostMapping("/sendIR")
     public ResponseEntity<String> sendIR(@CookieValue(value = "accessToken", required = false) String accessToken,
                                          @RequestParam("IRId") Long IRId,

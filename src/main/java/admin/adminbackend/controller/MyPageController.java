@@ -41,27 +41,29 @@ public class MyPageController {
         return ResponseEntity.ok().build();
     }
 
-
     // 개인 정보 보기
     @GetMapping("/memberInfo")
-    public String memberInfo(
-            @CookieValue(value = "accessToken", required = false) String accessToken,
-            HttpSession session,
-            Model model
+    public ResponseEntity<ResponseDTO<MemberDTO>> memberInfo(
+            @CookieValue(value = "accessToken", required = false) String accessToken
     ) {
-        // Member 엔티티를 가져옵니다.
+        if (accessToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO<>("로그인이 필요합니다.", null));
+        }
+
         Member member = memberService.getUserDetails(accessToken);
 
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseDTO<>("회원 정보를 찾을 수 없습니다.", null));
+        }
 
-        // Member 엔티티를 MemberDTO로 변환합니다.
         MemberDTO memberDTO = member.toMemberDTO();
 
-        // 모델에 MemberDTO를 추가합니다.
-        model.addAttribute("MypageMemberDTO", memberDTO);
-
-        // 뷰를 반환합니다.
-        return "mypage/memberInfo";
+        return ResponseEntity.ok(new ResponseDTO<>("회원 정보 조회 성공", memberDTO));
     }
+
+
     // 개인정보 수정
     @PostMapping("/editMemberInfoSubmit")
     public ResponseEntity<ResponseDTO<Void>> editMemberInfoSubmit(
@@ -101,6 +103,10 @@ public class MyPageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO<>("회원 정보 수정 중 오류가 발생했습니다.", null));
         }
     }
+
+
+
+
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");

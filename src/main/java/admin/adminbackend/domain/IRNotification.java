@@ -25,6 +25,8 @@ public class IRNotification {
 
         private LocalDateTime createdAt = LocalDateTime.now();  // 기본값 설정
 
+        private String ventureName;
+
 
         @ManyToOne
         @JoinColumn(name = "member_id")
