@@ -4,6 +4,7 @@ import admin.adminbackend.domain.Investment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.Payment;
 import admin.adminbackend.domain.PaymentStatus;
+import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
 import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.repository.InvestmentRepository;
@@ -55,7 +56,27 @@ public class InvestmentService {
     }
 
     @Transactional
-    public List<Investment> getInvestmemtListfindByMemberId(Member member) {
-        return investmentRepository.findByMemberId(member.getId());
+    public List<InvestmentHistoryDTO> getInvestmentListByMemberId(Member member) {
+        // 투자 내역 가져오기
+        List<Investment> investmentList = investmentRepository.findByMemberId(member.getId());
+
+        // Investment -> InvestmentHistoryDTO로 변환하여 리턴
+        return investmentList.stream().map(this::convertToDto).toList();
+    }
+
+    // Investment -> InvestmentHistoryDTO 변환 메소드
+    private InvestmentHistoryDTO convertToDto(Investment investment) {
+        InvestmentHistoryDTO dto = new InvestmentHistoryDTO();
+        dto.setInvestmentUid(investment.getInvestmentUid());
+        dto.setAmount(investment.getAmount());
+        dto.setInvestedAt(investment.getInvestedAt());
+
+        // 투자자 이름 설정 (investment.getInvestor().getName())
+        dto.setMemberName(investment.getInvestor() != null ? investment.getInvestor().getName() : null);
+
+        // 벤처 기업 이름 설정 (investment.getVentureListInfo().getVentureName())
+        dto.setVentureName(investment.getVentureListInfo() != null ? investment.getVentureListInfo().getName() : null);
+
+        return dto;
     }
 }

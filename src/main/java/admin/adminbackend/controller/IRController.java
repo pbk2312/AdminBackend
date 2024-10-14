@@ -58,6 +58,7 @@ public class IRController {
         }
     }
 
+    // 기업 입장에서 들어온 IR 체크
     @GetMapping("/IRCheck")
     public ResponseEntity<?> IRCheck(
             @CookieValue(value = "accessToken", required = false) String accessToken) {
@@ -84,6 +85,7 @@ public class IRController {
     }
 
 
+    // 보낸 IR 체크
     @GetMapping("/IRSendCheck")
     public ResponseEntity<?> sendIRCheck(@CookieValue(value = "accessToken", required = false) String accessToken){
 
@@ -110,7 +112,7 @@ public class IRController {
 
 
 
-    // 마이페이지에서 IR 전송
+    // 기업이 마이페이지에서 IR 전송
     @PostMapping("/sendIR")
     public ResponseEntity<String> sendIR(@CookieValue(value = "accessToken", required = false) String accessToken,
                                          @RequestParam("IRId") Long IRId,

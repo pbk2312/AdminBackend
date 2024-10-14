@@ -30,8 +30,16 @@ public class Member {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private VentureListInfo ventureListInfo;
 
-    @OneToMany(mappedBy = "investor")
-    private List<Investment> investments; // 투자 내역
+    @OneToMany(mappedBy = "investor", cascade = CascadeType.ALL, orphanRemoval = true) // Member가 삭제되면 투자내역도 삭제
+    private List<Investment> investments;
+
+    // IRNotification 수령인 (ceo 역할)
+    @OneToMany(mappedBy = "ceo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IRNotification> receivedIRNotifications;
+
+    // IRNotification 발송인 (member 역할)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IRNotification> sentIRNotifications;
 
     // 병합된 부분: 필드들 통합
     private String name;
