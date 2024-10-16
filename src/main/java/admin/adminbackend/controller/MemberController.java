@@ -44,11 +44,11 @@ public class MemberController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody MemberRequestDTO memberRequestDTO) {
+    public ResponseEntity<MemberResponseDTO> register(@RequestBody MemberRequestDTO memberRequestDTO) {
         log.info("회원 가입 요청이 들어왔습니다.");
-        memberService.register(memberRequestDTO);  // 회원 가입 로직 수행
+        MemberResponseDTO memberResponseDTO = memberService.register(memberRequestDTO);// 회원 가입 로직 수행
         log.info("회원 가입이 완료되었습니다. 회원 Email: {}", memberRequestDTO.getEmail());
-        return ResponseEntity.ok("회원가입이 성공적으로 완료되었습니다.");
+        return ResponseEntity.ok(memberResponseDTO);
     }
 
     // 로그인
@@ -94,9 +94,12 @@ public class MemberController {
 
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody LogoutDTO logoutDTO, HttpServletResponse response) {
+    public ResponseEntity<String> logout(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            HttpServletResponse response) {
         log.info("로그아웃 요청이 들어왔습니다.");
-        memberService.logout(logoutDTO);
+        Member member = memberService.getUserDetails(accessToken);
+        memberService.logout(member);
         log.info("로그아웃이 완료되었습니다.");
 
         // 쿠키 제거

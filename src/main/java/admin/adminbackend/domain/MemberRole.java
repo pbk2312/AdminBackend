@@ -3,7 +3,10 @@ package admin.adminbackend.domain;
 public enum MemberRole {
 
     VENTURE,
-    MEMBER,
+
+    VENTURE_PENDING,
+
+    PERSON,
     ADMIN
 }
 

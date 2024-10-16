@@ -36,10 +36,14 @@ public class ContractController {
 
 
     @PostMapping("/save-investor-part")  //투자자가 먼저 정보 입력하고, 이를 기반으로 초안 생성하여 저장
-    public ResponseEntity<String> saveInvestorPart(@RequestBody Map<String, String> investorData) {
+    public ResponseEntity<String> saveInvestorPart(@RequestBody Map<String, String> investorData,
+                                                   @RequestParam("ventureId") Long ventureId,
+                                                   @CookieValue(value = "accessToken", required = false) String accessToken
+                                                   ) {
         try {
+            Member member = memberService.getUserDetails(accessToken);
             // 초안 생성 로직 (투자자 정보 저장)
-            contractService.saveDraft(investorData);
+            contractService.saveDraft(investorData,ventureId,member);
             return new ResponseEntity<>("투자자 정보 일부 저장됨. 초안 생성됨.", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error saving investor part", HttpStatus.INTERNAL_SERVER_ERROR);

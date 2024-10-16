@@ -29,7 +29,7 @@ public class Investment {
     @JoinColumn(name = "payment_id")
     private Payment payment; // 결제 정보
 
-    private Long amount; // 투자 금액
+    private Long price; // 투자 금액
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Venture_id", nullable = false)

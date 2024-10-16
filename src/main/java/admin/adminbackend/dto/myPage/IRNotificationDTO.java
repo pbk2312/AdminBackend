@@ -13,6 +13,5 @@ public class IRNotificationDTO {
     private String ventureEmail;
     private Long personId;
     private String personEmail;
-    private boolean isRead;
     private LocalDateTime createdAt;
 }

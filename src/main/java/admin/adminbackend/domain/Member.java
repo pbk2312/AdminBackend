@@ -25,6 +25,7 @@ public class Member {
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private MemberRole memberRole;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)

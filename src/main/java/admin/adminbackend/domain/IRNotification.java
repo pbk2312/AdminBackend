@@ -21,7 +21,6 @@ public class IRNotification {
         @JsonIgnore  // 순환 참조 방지
         private Member ceo; // 수령인
 
-        private boolean isRead;
 
         private LocalDateTime createdAt = LocalDateTime.now();  // 기본값 설정
 

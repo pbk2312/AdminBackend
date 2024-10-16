@@ -1,12 +1,14 @@
 package admin.adminbackend.openapi.service;
 
 import admin.adminbackend.domain.Member;
+import admin.adminbackend.domain.MemberRole;
 import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
 import admin.adminbackend.openapi.domain.UploadFile;
 import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.openapi.domain.VentureListInfoForm;
 import admin.adminbackend.openapi.exception.ResourceNotFoundException;
 import admin.adminbackend.openapi.file.FileStore;
+import admin.adminbackend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -30,6 +32,7 @@ public class VentureService {
     public final VentureListInfoRepository ventureListInfoRepository;
     private final FileStore fileStore;
     private final VentureStatusService ventureStatusService;
+    private final MemberRepository memberRepository;
 
     /*public Long saveVenture(VentureListInfoForm form) throws IOException {
         UploadFile attachFile = fileStore.storeFile(form.getAttachFile());
@@ -48,7 +51,6 @@ public class VentureService {
         venture.setB_stt(form.getB_stt());
 
         Venture savedVenture = ventureRepository.save(venture);*/
-
 
     // 2. VentureListInfo 테이블에 저장
         /*VentureListInfo ventureListInfo = new VentureListInfo();
@@ -80,10 +82,15 @@ public class VentureService {
         UploadFile attachFile = fileStore.storeFile(file);
 
         // 기업 상태를 조회
-        JSONObject ventureStatus = ventureStatusService.getCompanyNum(form.getVentureNumber(),member);
+        JSONObject ventureStatus = ventureStatusService.getCompanyNum(form.getVentureNumber(), member);
         if (ventureStatus != null) {
             form.setB_stt((String) ventureStatus.get("b_stt"));
         }
+
+        // member 기업 승급
+
+        member.setMemberRole(MemberRole.VENTURE);
+        memberRepository.save(member);
 
         // VentureListInfo 엔티티 객체를 생성, 폼 데이터를 설정
         VentureListInfo ventureListInfo = new VentureListInfo();
@@ -102,6 +109,7 @@ public class VentureService {
         ventureListInfo.setVentureNumber(form.getVentureNumber());
         ventureListInfo.setAttachFile(attachFile); // 파일 정보를 설정
         ventureListInfo.setB_stt(form.getB_stt());
+        ventureListInfo.setMember(member);
 
         // VentureListInfo 엔티티를 저장
         VentureListInfo savedVentureListInfo = ventureListInfoRepository.save(ventureListInfo);

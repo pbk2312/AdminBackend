@@ -28,7 +28,7 @@ public interface MemberService {
 
     TokenDTO login(LoginDTO loginDTO);
 
-    void logout(LogoutDTO logoutDTO);
+    void logout(Member member);
 
     String memberChangePassword(MemberChangePasswordDTO memberChangePasswordDTO);
 

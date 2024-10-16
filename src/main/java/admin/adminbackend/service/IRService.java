@@ -27,7 +27,6 @@ public class IRService {
             IRNotification notification = new IRNotification();
             notification.setCeo(ceo);
             notification.setMember(member);
-            notification.setRead(false); // 기본적으로 읽지 않은 상태로 설정
             notification.setVentureName(ventureListInfo.getName());
             // Save notification to the repository
             irNotificationRepository.save(notification);
@@ -61,7 +60,6 @@ public class IRService {
                     ventureMember != null ? ventureMember.getEmail() : null,
                     personMember != null ? personMember.getId() : null,
                     personMember != null ? personMember.getEmail() : null,
-                    ir.isRead(),
                     ir.getCreatedAt()
             );
         }).collect(Collectors.toList());
@@ -90,7 +88,6 @@ public class IRService {
                     ventureMember != null ? ventureMember.getEmail() : null,
                     personMember != null ? personMember.getId() : null,
                     personMember != null ? personMember.getEmail() : null,
-                    ir.isRead(),
                     ir.getCreatedAt()
             );
         }).collect(Collectors.toList());

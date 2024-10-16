@@ -31,7 +31,7 @@ public class InvestmentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public Investment createInvestment(Long memberId, Long ventureId, Long amount) {
+    public Investment createInvestment(Long memberId, Long ventureId, Long price) {
         // 투자자(Member) 조회
         Member investor = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
@@ -39,7 +39,7 @@ public class InvestmentService {
         // 벤처 정보(VentureListInfo) 조회
         VentureListInfo ventureListInfo = ventureListInfoRepository.getReferenceById(ventureId);
         // 결제 정보 저장
-        Payment payment = new Payment(amount, PaymentStatus.PENDING);
+        Payment payment = new Payment(price, PaymentStatus.PENDING);
         Payment paymentSave = paymentRepository.save(payment);// Payment 저장
 
         // Investment 엔티티 생성
@@ -47,7 +47,7 @@ public class InvestmentService {
         investment.setInvestmentUid(UUID.randomUUID().toString());
         investment.setInvestor(investor);
         investment.setVentureListInfo(ventureListInfo);
-        investment.setAmount(amount);
+        investment.setPrice(price);
         investment.setInvestedAt(LocalDateTime.now());
         investment.setPayment(paymentSave);
 
@@ -68,7 +68,7 @@ public class InvestmentService {
     private InvestmentHistoryDTO convertToDto(Investment investment) {
         InvestmentHistoryDTO dto = new InvestmentHistoryDTO();
         dto.setInvestmentUid(investment.getInvestmentUid());
-        dto.setAmount(investment.getAmount());
+        dto.setAmount(investment.getPrice());
         dto.setInvestedAt(investment.getInvestedAt());
 
         // 투자자 이름 설정 (investment.getInvestor().getName())

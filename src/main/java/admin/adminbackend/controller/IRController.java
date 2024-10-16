@@ -44,7 +44,7 @@ public class IRController {
             VentureListInfo ventureInfo = ventureListInfoService.getCompanyById(ventureId);
 
             Member CEO = ventureInfo.getMember(); // 대표님
-            boolean success = irService.IRSend(CEO, member,ventureInfo);
+            boolean success = irService.IRSend(CEO, member, ventureInfo);
 
             if (success) {
                 return ResponseEntity.ok("IR 요청 성공");
@@ -87,7 +87,7 @@ public class IRController {
 
     // 보낸 IR 체크
     @GetMapping("/IRSendCheck")
-    public ResponseEntity<?> sendIRCheck(@CookieValue(value = "accessToken", required = false) String accessToken){
+    public ResponseEntity<?> sendIRCheck(@CookieValue(value = "accessToken", required = false) String accessToken) {
 
         Member member = memberService.getUserDetails(accessToken);
 
@@ -111,11 +111,10 @@ public class IRController {
     }
 
 
-
     // 기업이 마이페이지에서 IR 전송
     @PostMapping("/sendIR")
     public ResponseEntity<String> sendIR(@CookieValue(value = "accessToken", required = false) String accessToken,
-                                         @RequestParam("IRId") Long IRId,
+                                         @RequestParam("Id") Long IRId,
                                          @RequestParam("file") MultipartFile file) {
         Member ceo = memberService.getUserDetails(accessToken);
         log.info("IR 전송 멤버: {}", ceo);
@@ -145,7 +144,6 @@ public class IRController {
         IRNotification irNotification = irService.findIRSendMember(IRId);
 
         if (irNotification != null) {
-            irNotification.setRead(true);
             irService.saveIRNotification(irNotification);
             return ResponseEntity.ok("IR 자료를 읽었습니다.");
         } else {
