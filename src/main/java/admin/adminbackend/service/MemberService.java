@@ -1,7 +1,6 @@
 package admin.adminbackend.service;
 
 import admin.adminbackend.domain.Member;
-import admin.adminbackend.dto.MemberDTO;
 import admin.adminbackend.dto.WithdrawalMembershipDTO;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
@@ -12,9 +11,6 @@ import admin.adminbackend.dto.register.MemberRequestDTO;
 import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
 
-
-
-
 public interface MemberService {
 
     MemberResponseDTO register(MemberRequestDTO memberRequestDTO);
@@ -22,6 +18,7 @@ public interface MemberService {
     // 회원 탈퇴를 처리하는 메서드
     String deleteAccount(WithdrawalMembershipDTO withdrawalMembershipDTO);
     EmailResponseDTO sendCertificationMail(EmailRequestDTO emailRequestDTO);
+
 
     // 비밀번호 재설정을 위한 이메일을 발송하는 메서드
     String sendPasswordResetEmail(EmailRequestDTO emailRequestDTO);
@@ -38,7 +35,7 @@ public interface MemberService {
     Member findByEmail(String email);
 
     Member findByRefreshToken(String refreshToken);
-    void updateMember(Member member, MemberDTO mypageMemberDTO);
+
 
     void registerMemberWithVenture(Member member);
 

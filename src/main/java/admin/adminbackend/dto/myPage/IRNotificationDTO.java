@@ -9,10 +9,9 @@ import java.time.LocalDateTime;
 public class IRNotificationDTO {
 
     private Long id;
-    private Long ventureId;
+    private String ventureName;
     private String ventureEmail;
     private Long personId;
     private String personEmail;
-    private boolean isRead;
     private LocalDateTime createdAt;
 }

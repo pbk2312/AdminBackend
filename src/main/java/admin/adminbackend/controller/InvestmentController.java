@@ -50,6 +50,7 @@ public class InvestmentController {
         responseDTO.setVentureId(investmentDTO.getVentureId());
         responseDTO.setAmount(investmentDTO.getAmount());
         responseDTO.setInvestedAt(investment.getInvestedAt());
+        responseDTO.setPaymentId(investment.getPayment().getId());
 
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
@@ -62,25 +63,15 @@ public class InvestmentController {
         Member member = memberService.getUserDetails(accessToken);
 
         // 해당 회원의 투자 내역 조회
-        List<Investment> listInvestment = investmentService.getInvestmemtListfindByMemberId(member);
+        List<InvestmentHistoryDTO> investmentListByMemberId = investmentService.getInvestmentListByMemberId(member);
 
-        if (listInvestment.isEmpty()) {
+        if (investmentListByMemberId.isEmpty()) {
             // 투자 내역이 없을 때 404 응답과 메시지 반환
             return new ResponseEntity<>("투자 내역이 없습니다.", HttpStatus.NOT_FOUND);
         }
 
-        // 투자 내역을 DTO로 변환
-        List<InvestmentHistoryDTO> investmentDTOList = listInvestment.stream().map(investment -> {
-            InvestmentHistoryDTO investmentHistoryDTO = new InvestmentHistoryDTO();
-            investmentHistoryDTO.setInvestmentUid(investment.getInvestmentUid());
-            investmentHistoryDTO.setAmount(investment.getAmount());
-            investmentHistoryDTO.setInvestedAt(investment.getInvestedAt());
-            investmentHistoryDTO.setMemberName(member.getName());
-            investmentHistoryDTO.setVentureName(investment.getVentureListInfo().getName());
-            return investmentHistoryDTO;
-        }).collect(Collectors.toList());
 
         // 성공적으로 조회한 투자 내역 DTO 반환
-        return ResponseEntity.ok(investmentDTOList);
+        return ResponseEntity.ok(investmentListByMemberId);
     }
 }

@@ -4,6 +4,7 @@ import admin.adminbackend.domain.Investment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.Payment;
 import admin.adminbackend.domain.PaymentStatus;
+import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.openapi.Repository.VentureListInfoRepository;
 import admin.adminbackend.openapi.domain.VentureListInfo;
 import admin.adminbackend.repository.InvestmentRepository;
@@ -30,7 +31,7 @@ public class InvestmentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public Investment createInvestment(Long memberId, Long ventureId, Long amount) {
+    public Investment createInvestment(Long memberId, Long ventureId, Long price) {
         // 투자자(Member) 조회
         Member investor = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
@@ -38,7 +39,7 @@ public class InvestmentService {
         // 벤처 정보(VentureListInfo) 조회
         VentureListInfo ventureListInfo = ventureListInfoRepository.getReferenceById(ventureId);
         // 결제 정보 저장
-        Payment payment = new Payment(amount, PaymentStatus.PENDING);
+        Payment payment = new Payment(price, PaymentStatus.PENDING);
         Payment paymentSave = paymentRepository.save(payment);// Payment 저장
 
         // Investment 엔티티 생성
@@ -46,7 +47,7 @@ public class InvestmentService {
         investment.setInvestmentUid(UUID.randomUUID().toString());
         investment.setInvestor(investor);
         investment.setVentureListInfo(ventureListInfo);
-        investment.setAmount(amount);
+        investment.setPrice(price);
         investment.setInvestedAt(LocalDateTime.now());
         investment.setPayment(paymentSave);
 
@@ -55,7 +56,27 @@ public class InvestmentService {
     }
 
     @Transactional
-    public List<Investment> getInvestmemtListfindByMemberId(Member member) {
-        return investmentRepository.findByMemberId(member.getId());
+    public List<InvestmentHistoryDTO> getInvestmentListByMemberId(Member member) {
+        // 투자 내역 가져오기
+        List<Investment> investmentList = investmentRepository.findByMemberId(member.getId());
+
+        // Investment -> InvestmentHistoryDTO로 변환하여 리턴
+        return investmentList.stream().map(this::convertToDto).toList();
+    }
+
+    // Investment -> InvestmentHistoryDTO 변환 메소드
+    private InvestmentHistoryDTO convertToDto(Investment investment) {
+        InvestmentHistoryDTO dto = new InvestmentHistoryDTO();
+        dto.setInvestmentUid(investment.getInvestmentUid());
+        dto.setAmount(investment.getPrice());
+        dto.setInvestedAt(investment.getInvestedAt());
+
+        // 투자자 이름 설정 (investment.getInvestor().getName())
+        dto.setMemberName(investment.getInvestor() != null ? investment.getInvestor().getName() : null);
+
+        // 벤처 기업 이름 설정 (investment.getVentureListInfo().getVentureName())
+        dto.setVentureName(investment.getVentureListInfo() != null ? investment.getVentureListInfo().getName() : null);
+
+        return dto;
     }
 }

@@ -74,9 +74,8 @@ public class MemberServiceImpl implements MemberService {
         }
 
         // 인증번호 확인 후 회원 가입 진행
-        Member member = memberRequestDTO.toMember(passwordEncoder);
+        Member member = memberRequestDTO.toMember(passwordEncoder,memberRequestDTO);
         Member savedMember = memberRepository.save(member);
-
 
         emailRepository.delete(emailCertification);
 
@@ -103,24 +102,22 @@ public class MemberServiceImpl implements MemberService {
         log.info("JWT 토큰 생성 완료");
 
         // 4. Redis에 RefreshToken 저장
-        redisService.setStringValue(String.valueOf(member.getId()), tokenDTO.getRefreshToken(), REFRESH_TOKEN_EXPIRE_TIME);
+        redisService.setStringValue(String.valueOf(member.getId()), tokenDTO.getRefreshToken(),
+                REFRESH_TOKEN_EXPIRE_TIME);
         log.info("Redis에 RefreshToken 저장 완료: 사용자 아이디={}", authentication.getName());
 
         // 5. 토큰 발급
         log.info("로그인 완료: 사용자 아이디={}", authentication.getName());
         return tokenDTO;
     }
+
     // 로그아웃
     @Transactional
-    public void logout(LogoutDTO logoutDTO) {
-        log.info("로그아웃 시도: 사용자 아이디={}", logoutDTO.getEmail());
-
-        // 이메일로 멤버 찾기
-        Member member = findByEmail(logoutDTO.getEmail());
+    public void logout(Member member) {
+        log.info("로그아웃 시도: 사용자 아이디={}", member.getEmail());
 
         // Redis에서 Refresh Token 삭제
         redisService.deleteStringValue(String.valueOf(member.getId()));
-        log.info("Redis에서 RefreshToken 삭제 완료: 사용자 아이디={}", logoutDTO.getEmail());
     }
 
     // 비밀번호 재설정
@@ -158,7 +155,8 @@ public class MemberServiceImpl implements MemberService {
         resetTokenRepository.save(tokenEntity);
 
         // 비밀번호 재설정 링크
-        String resetLink = "http://localhost:8080/member/updatePassword?token=" + resetToken + "&email=" + emailRequestDTO.getEmail();
+        String resetLink = "http://localhost:8080/member/updatePassword?token=" + resetToken + "&email="
+                + emailRequestDTO.getEmail();
 
         // 이메일 보내기
         boolean emailSent = emailProvider.sendPasswordResetEmail(emailRequestDTO, resetLink);
@@ -221,7 +219,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public String deleteAccount(WithdrawalMembershipDTO withdrawalMembershipDTO) {
-        Member member = memberRepository.findByEmail(withdrawalMembershipDTO.getEmail()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원 입니다."));
+        Member member = memberRepository.findByEmail(withdrawalMembershipDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원 입니다."));
         validatePassword(withdrawalMembershipDTO.getPassword(), member.getPassword());
         // 해당 회원의 RefreshToken을 삭제합니다.
 
@@ -229,11 +228,9 @@ public class MemberServiceImpl implements MemberService {
 
         log.info("회원 정보 삭제...");
 
-
         return "회원 정보가 정상적으로 삭제되었습니다.";
 
     }
-
 
 
     public void registerMemberWithVenture(Member member) {
@@ -248,6 +245,7 @@ public class MemberServiceImpl implements MemberService {
             log.info("Venture information saved for member ID: {}", savedMember.getId());
         }
     }
+
     public Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElse(null); // 존재하지 않으면 null 반환
@@ -277,6 +275,7 @@ public class MemberServiceImpl implements MemberService {
         }
         return sb.toString();
     }
+
     @Transactional
     public void updateMember(Member member, MemberDTO mypageMemberDTO) {
         // 개인정보 수정

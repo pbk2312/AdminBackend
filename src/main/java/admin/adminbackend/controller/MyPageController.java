@@ -1,21 +1,23 @@
 package admin.adminbackend.controller;
 
+import admin.adminbackend.domain.Investment;
 import admin.adminbackend.domain.Member;
+import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.dto.MemberDTO;
 
 import admin.adminbackend.dto.ResponseDTO;
+import admin.adminbackend.service.InvestmentService;
 import admin.adminbackend.service.MemberServiceImpl;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-
 
 
 @RestController
@@ -26,6 +28,7 @@ public class MyPageController {
 
     private final MemberServiceImpl memberService;
     private final PasswordEncoder passwordEncoder;
+    private final InvestmentService investmentService;
 
 
     // 비밀번호 확인
@@ -41,27 +44,29 @@ public class MyPageController {
         return ResponseEntity.ok().build();
     }
 
-
     // 개인 정보 보기
     @GetMapping("/memberInfo")
-    public String memberInfo(
-            @CookieValue(value = "accessToken", required = false) String accessToken,
-            HttpSession session,
-            Model model
+    public ResponseEntity<ResponseDTO<MemberDTO>> memberInfo(
+            @CookieValue(value = "accessToken", required = false) String accessToken
     ) {
-        // Member 엔티티를 가져옵니다.
+        if (accessToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO<>("로그인이 필요합니다.", null));
+        }
+
         Member member = memberService.getUserDetails(accessToken);
 
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseDTO<>("회원 정보를 찾을 수 없습니다.", null));
+        }
 
-        // Member 엔티티를 MemberDTO로 변환합니다.
         MemberDTO memberDTO = member.toMemberDTO();
 
-        // 모델에 MemberDTO를 추가합니다.
-        model.addAttribute("MypageMemberDTO", memberDTO);
-
-        // 뷰를 반환합니다.
-        return "mypage/memberInfo";
+        return ResponseEntity.ok(new ResponseDTO<>("회원 정보 조회 성공", memberDTO));
     }
+
+
     // 개인정보 수정
     @PostMapping("/editMemberInfoSubmit")
     public ResponseEntity<ResponseDTO<Void>> editMemberInfoSubmit(
@@ -98,9 +103,28 @@ public class MyPageController {
             return ResponseEntity.ok(new ResponseDTO<>("회원 정보가 성공적으로 수정되었습니다.", null));
         } catch (Exception e) {
             log.error("회원 정보 수정 중 오류 발생: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO<>("회원 정보 수정 중 오류가 발생했습니다.", null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO<>("회원 정보 수정 중 오류가 발생했습니다.", null));
         }
     }
+
+
+    @GetMapping("/investmentHistory")
+    public ResponseEntity<ResponseDTO<List<InvestmentHistoryDTO>>> getInvestmentHistory(
+            @CookieValue(value = "accessToken", required = false) String accessToken) {
+
+        // 회원 정보 가져오기
+        Member member = memberService.getUserDetails(accessToken);
+
+        // 투자 내역 가져오기 (Investment -> InvestmentHistoryDTO로 변환된 리스트)
+        List<InvestmentHistoryDTO> investmentListByMemberId = investmentService.getInvestmentListByMemberId(member);
+
+        // ResponseDTO 객체 생성 - 메시지와 데이터를 함께 전달
+        ResponseDTO<List<InvestmentHistoryDTO>> response = new ResponseDTO<>("투자 내역 조회 성공", investmentListByMemberId);
+
+        return ResponseEntity.ok(response);
+    }
+
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");

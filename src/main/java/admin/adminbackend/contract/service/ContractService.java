@@ -1,5 +1,9 @@
 package admin.adminbackend.contract.service;
 
+import admin.adminbackend.domain.Investment;
+import admin.adminbackend.domain.Member;
+import admin.adminbackend.service.IRService;
+import admin.adminbackend.service.InvestmentService;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -7,6 +11,7 @@ import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.forms.PdfAcroForm;
 import com.itextpdf.forms.fields.PdfFormField;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
@@ -22,6 +27,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ContractService {
 
     @Value("${file.storage.path}")
@@ -29,8 +35,10 @@ public class ContractService {
 
     private Map<String, String> draft;  // 초안을 저장할 임시 저장소
 
+    private final InvestmentService investmentService;
+
     // 투자자 정보 저장 (초안 생성)
-    public void saveDraft(Map<String, String> investorData) throws IOException {
+    public void saveDraft(Map<String, String> investorData, Long ventureId, Member member) throws IOException {
         draft = new HashMap<>();
 
         // 현재 날짜를 자동으로 설정 (날짜가 없는 경우)
@@ -46,6 +54,8 @@ public class ContractService {
 
         // PDF 초안 생성
         createContractDraft(investorData);
+        String price = investorData.get("price");
+        Investment investment = investmentService.createInvestment(member.getId(), ventureId, Long.parseLong(price));
     }
 
     // 초안 PDF 생성 로직
@@ -106,7 +116,8 @@ public class ContractService {
 
 
     // 기업 정보 입력 후 계약서 완성
-    public void completeContract(Map<String, String> companyData, String userPassword, String ownerPassword) throws IOException {
+    public void completeContract(Map<String, String> companyData, String userPassword, String ownerPassword)
+            throws IOException {
         log.info("Received company data: {}", companyData);  // 회사 정보 로그 출력
         log.info("Draft before adding company data: {}", draft);  // 초안 데이터 로그 출력
 
@@ -126,7 +137,8 @@ public class ContractService {
     }
 
     // 최종 계약서 생성 및 암호화
-    private void generateFinalContract(Map<String, String> fieldData, String ownerPassword, String userPassword) throws IOException {
+    private void generateFinalContract(Map<String, String> fieldData, String ownerPassword, String userPassword)
+            throws IOException {
         String filledFilePath = storagePath + "final_contract.pdf";
         String protectedFilePath = storagePath + "protected_contract.pdf";
 
@@ -195,10 +207,12 @@ public class ContractService {
     }
 
     // PDF 파일 암호화
-    private void encryptPdf(File inputFile, File outputFile, String ownerPassword, String userPassword) throws IOException {
+    private void encryptPdf(File inputFile, File outputFile, String ownerPassword, String userPassword)
+            throws IOException {
         try (PDDocument document = PDDocument.load(inputFile)) {
             AccessPermission accessPermission = new AccessPermission();
-            StandardProtectionPolicy protectionPolicy = new StandardProtectionPolicy(ownerPassword, userPassword, accessPermission);
+            StandardProtectionPolicy protectionPolicy = new StandardProtectionPolicy(ownerPassword, userPassword,
+                    accessPermission);
             protectionPolicy.setEncryptionKeyLength(128);  // 128-bit 암호화
             protectionPolicy.setPermissions(accessPermission);
 
