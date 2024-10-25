@@ -141,7 +141,8 @@ public class ContractService {
     }
 
     private void createContract(String outputFilePath, Map<String, String> fieldData) throws IOException {
-        String templatePath = "D:/Admin/ProtectedFileStore/test4.pdf";
+        ///String templatePath = "D:/Admin/ProtectedFileStore/test4.pdf";
+        String templatePath = "templates/test4.pdf";
         try (PdfDocument pdfDoc = new PdfDocument(new PdfReader(templatePath), new PdfWriter(outputFilePath))) {
             PdfAcroForm form = PdfAcroForm.getAcroForm(pdfDoc, true);
             if (form == null) {
@@ -153,7 +154,8 @@ public class ContractService {
                 throw new IllegalArgumentException("No fields found in the PDF.");
             }
 
-            String fontPath = "D:/NanumMyeongjo.ttf";
+            //String fontPath = "D:/NanumMyeongjo.ttf";
+            String fontPath = "templates/NanumMyeongjo.ttf";
             PdfFont font = PdfFontFactory.createFont(fontPath, "Identity-H", true);
 
             Map<String, String> fieldMapping = createFieldMapping();
