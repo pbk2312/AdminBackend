@@ -10,7 +10,6 @@ import admin.adminbackend.dto.WithdrawalMembershipDTO;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
 import admin.adminbackend.dto.login.LoginDTO;
-import admin.adminbackend.dto.login.LogoutDTO;
 import admin.adminbackend.dto.register.MemberChangePasswordDTO;
 import admin.adminbackend.dto.register.MemberRequestDTO;
 import admin.adminbackend.dto.register.MemberResponseDTO;
