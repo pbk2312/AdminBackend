@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 @Slf4j
 public class VentureStatusService {
-    public static JSONObject getCompanyNum(@org.springframework.web.bind.annotation.RequestBody String b_no, Member member) {
+    public static JSONObject getCompanyNum(@org.springframework.web.bind.annotation.RequestBody String b_no) {
         //okhttp3으로 통신
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("application/json");

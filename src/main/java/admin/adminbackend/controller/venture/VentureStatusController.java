@@ -24,11 +24,9 @@ public class VentureStatusController {
     private final MemberService memberService;
 
     @PostMapping("/api/ventureStatus")
-    public JSONObject getCompanyNum(@RequestBody String b_no,
-                                    @CookieValue(value = "accessToken", required = false) String accessToken
+    public JSONObject getCompanyNum(@RequestBody String b_no
                                     ) {
-        Member member = memberService.getUserDetails(accessToken);
-        return ventureStatusService.getCompanyNum(b_no,member);
+        return ventureStatusService.getCompanyNum(b_no);
     }
 
 }
