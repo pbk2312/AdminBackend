@@ -3,8 +3,8 @@ package admin.adminbackend.controller;
 
 import admin.adminbackend.domain.Investment;
 import admin.adminbackend.dto.payment.PaymentDTO;
-import admin.adminbackend.repository.InvestmentRepository;
-import admin.adminbackend.service.PaymentService;
+import admin.adminbackend.repository.investment.InvestmentRepository;
+import admin.adminbackend.service.investment.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;

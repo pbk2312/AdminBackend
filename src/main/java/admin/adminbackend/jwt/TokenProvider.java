@@ -1,7 +1,7 @@
 package admin.adminbackend.jwt;
 
 import admin.adminbackend.dto.token.TokenDTO;
-import admin.adminbackend.service.CustomUserDetailsService;
+import admin.adminbackend.service.member.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

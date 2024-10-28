@@ -1,7 +1,7 @@
 package admin.adminbackend.domain;
 
 import admin.adminbackend.dto.MemberDTO;
-import admin.adminbackend.openapi.domain.VentureListInfo;
+import admin.adminbackend.domain.kim.VentureListInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
