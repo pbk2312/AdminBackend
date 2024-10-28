@@ -31,10 +31,8 @@ public class InvestmentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public Investment createInvestment(Long memberId, Long ventureId, Long price) {
-        // 투자자(Member) 조회
-        Member investor = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
+    public Investment createInvestment(Member member,Long ventureId, Long price, String address,String getBusinessName
+    ) {
 
         // 벤처 정보(VentureListInfo) 조회
         VentureListInfo ventureListInfo = ventureListInfoRepository.getReferenceById(ventureId);
@@ -45,12 +43,13 @@ public class InvestmentService {
         // Investment 엔티티 생성
         Investment investment = new Investment();
         investment.setInvestmentUid(UUID.randomUUID().toString());
-        investment.setInvestor(investor);
+        investment.setInvestor(member);
         investment.setVentureListInfo(ventureListInfo);
         investment.setPrice(price);
         investment.setInvestedAt(LocalDateTime.now());
         investment.setPayment(paymentSave);
-
+        investment.setAddress(address);
+        investment.setBusinessName(getBusinessName);
         // Investment 저장
         return investmentRepository.save(investment);
     }

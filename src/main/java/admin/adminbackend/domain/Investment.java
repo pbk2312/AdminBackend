@@ -37,4 +37,8 @@ public class Investment {
 
     private LocalDateTime investedAt; // 투자 시각
 
+    private String businessName; // 상호명
+
+    private String address;
+
 }

@@ -17,46 +17,53 @@
     <label for="amount">Investment Amount:</label><br>
     <input type="number" id="amount" name="amount" required><br><br>
 
+    <label for="address">Address:</label><br>
+    <input type="text" id="address" name="address" required><br><br>
+
+    <label for="businessName">Business Name:</label><br>
+    <input type="text" id="businessName" name="businessName" required><br><br>
+
     <button type="submit">Create Investment</button>
 </form>
 
 <div id="result"></div>
 
-<script>document.getElementById('investmentForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // 폼의 기본 제출 동작을 막음
+<script>
+    document.getElementById('investmentForm').addEventListener('submit', function (event) {
+        event.preventDefault();
 
-    const accessToken = document.getElementById('accessToken').value;
-    const ventureId = document.getElementById('ventureId').value;
-    const amount = document.getElementById('amount').value;
+        const accessToken = document.getElementById('accessToken').value;
+        const ventureId = document.getElementById('ventureId').value;
+        const amount = document.getElementById('amount').value;
+        const address = document.getElementById('address').value;
+        const businessName = document.getElementById('businessName').value;
 
-    fetch('/createInvest', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Bearer ' + accessToken
-        },
-        body: new URLSearchParams({
-            'ventureId': ventureId,
-            'amount': amount
+        fetch('/createInvest', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                accessToken: accessToken,
+                ventureId: ventureId,
+                amount: amount,
+                address: address,
+                businessName: businessName
+            })
         })
-    })
-        .then(response => response.json())
-        .then(data => {
-            const investmentId = data.investmentId;
-            const totalPrice = amount; // 또는 data.totalPrice를 사용할 수 있습니다.
-
-            // 항상 리다이렉트하도록 수정
-            window.location.href = `/paymentPage?investmentId=${investmentId}&totalPrice=${totalPrice}`;
-        })
-        .catch(error => {
-            const investmentId = 'unknown';
-            const totalPrice = amount; // 또는 필요한 다른 값으로 대체 가능
-
-            // 오류가 발생해도 리다이렉트 수행
-            window.location.href = `/paymentPage?investmentId=${investmentId}&totalPrice=${totalPrice}`;
-        });
-});
-
+            .then(response => response.json())
+            .then(data => {
+                if (data.investmentId) {
+                    // 결제 페이지로 리다이렉트
+                    window.location.href = `/paymentPage?investmentId=${data.investmentId}&email=${accessToken}`;
+                } else {
+                    alert('투자 생성에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('투자 생성 실패:', error);
+            });
+    });
 </script>
 </body>
 </html>

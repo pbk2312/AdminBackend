@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface InvestmentRepository extends JpaRepository<Investment,Long> {
+public interface InvestmentRepository extends JpaRepository<Investment, Long> {
 
     @Query("select o from Investment o" +
             " left join fetch o.payment p" +
@@ -16,9 +16,13 @@ public interface InvestmentRepository extends JpaRepository<Investment,Long> {
             " where o.investmentUid = :investmentUid")
     Optional<Investment> findInvestmentAndPaymentAndMember(@Param("investmentUid") String investmentUid);
 
+    // 단순히 investmentUid로 Investment 조회
+    Optional<Investment> findByInvestmentUid(String investmentUid);
+
     // memberId로 Investment 리스트를 조회하는 쿼리
     @Query("select i from Investment i" +
             " where i.investor.id = :memberId")
     List<Investment> findByMemberId(@Param("memberId") Long memberId);
+
 
 }

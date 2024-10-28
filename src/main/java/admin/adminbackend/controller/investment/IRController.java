@@ -123,7 +123,7 @@ public class IRController {
         Member getPerson = irNotification.getMember();
 
         String subject = emailProvider.createEmailSubject();
-        String body = emailProvider.createEmailBody(IRId);
+        String body = emailProvider.createEmailBody(ceo.getVentureListInfo().getId());
 
         boolean result = emailProvider.sendFileEmail(getPerson.getEmail(), subject, body, file);
 

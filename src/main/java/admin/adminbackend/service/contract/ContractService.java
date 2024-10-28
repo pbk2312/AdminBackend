@@ -54,7 +54,6 @@ public class ContractService {
         // PDF 초안 생성
         createContractDraft(investorData);
         String price = investorData.get("price");
-        Investment investment = investmentService.createInvestment(member.getId(), ventureId, Long.parseLong(price));
     }
 
     // 초안 PDF 생성 로직

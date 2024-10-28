@@ -1,78 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IR Notification Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IR Notification Test</title>
 </head>
 <body>
 <h1>IR Notification Test</h1>
 
-
 <form id="irForm">
-  <label for="ventureName">Venture Name:</label>
-  <input type="text" id="ventureName" name="ventureName" required>
-  <label for="accessToken">Access Token:</label>
-  <input type="text" id="accessToken" name="accessToken" required>
-  <button type="submit">Send IR</button>
+    <label for="ventureName">Venture Name:</label>
+    <input type="text" id="ventureName" name="ventureName" required>
+    <label for="accessToken">Access Token:</label>
+    <input type="text" id="accessToken" name="accessToken" required>
+    <button type="submit">Send IR</button>
 </form>
 
-
 <form id="paymentForm">
-  <label for="investmentId">Investment ID:</label>
-  <input type="text" id="investmentId" name="investmentId" required>
+    <label for="amount">Investment Amount:</label>
+    <input type="number" id="amount" name="amount" required>
 
-  <label for="email">Email:</label>
-  <input type="email" id="email" name="email" required> <!-- 이메일 입력 필드 추가 -->
+    <label for="ventureId">Venture ID:</label>
+    <input type="text" id="ventureId" name="ventureId" required>
 
+    <label for="address">Address:</label>
+    <input type="text" id="address" name="address">
 
-  <button type="submit">Go to Payment Page</button>
+    <label for="businessName">Business Name:</label>
+    <input type="text" id="businessName" name="businessName">
+
+    <label for="accessToken">Access Token:</label>
+    <input type="text" id="accessToken" name="accessToken" required>
+
+    <button type="submit">Go to Payment Page</button>
 </form>
 
 <script>
+    document.getElementById('irForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
 
-  document.getElementById('irForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
+        const ventureName = document.getElementById('ventureName').value;
+        const accessToken = document.getElementById('accessToken').value;
 
-    const ventureName = document.getElementById('ventureName').value;
-    const accessToken = document.getElementById('accessToken').value;
-    const responseMessage = document.getElementById('responseMessage');
+        try {
+            const response = await fetch('http://localhost:8080/venture/info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ ventureName: ventureName })
+            });
 
-    try {
-      const response = await fetch('http://localhost:8080/venture/info', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Bearer ${accessToken}`  // 액세스 토큰을 헤더에 추가
-        },
-        body: new URLSearchParams({ ventureName: ventureName })
-      });
+            if (response.ok) {
+                const message = await response.text();
+                alert(message);
+            } else {
+                alert('IR 요청 실패');
+            }
+        } catch (error) {
+            alert('IR 요청 실패');
+            console.error('Error:', error);
+        }
+    });
 
-      if (response.ok) {
-        const message = await response.text();
-        responseMessage.textContent = message;
-      } else {
-        responseMessage.textContent = 'IR 요청 실패';
-      }
-    } catch (error) {
-      responseMessage.textContent = 'IR 요청 실패';
-      console.error('Error:', error);
-    }
-  });
+    document.getElementById('paymentForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
 
+        const amount = document.getElementById('amount').value;
+        const ventureId = document.getElementById('ventureId').value;
+        const address = document.getElementById('address').value;
+        const businessName = document.getElementById('businessName').value;
+        const accessToken = document.getElementById('accessToken').value;
 
-  document.getElementById('paymentForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+        try {
+            const response = await fetch('http://localhost:8080/createInvest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    investmentDTO: {
+                        amount: amount,
+                        ventureId: ventureId,
+                        address: address,
+                        businessName: businessName
+                    }
+                })
+            });
 
-    const investmentId = document.getElementById('investmentId').value;
-    const email = document.getElementById('email').value; // 이메일 값 가져오기
-
-    // GET 요청으로 URL에 쿼리 파라미터로 추가
-    const url = `/paymentPage?investmentId=${encodeURIComponent(investmentId)}&email=${encodeURIComponent(email)}`;
-
-    // 페이지 이동
-    window.location.href = url;
-  });
+            if (response.ok) {
+                const data = await response.json();
+                alert('투자 생성 성공: ' + JSON.stringify(data));
+            } else {
+                alert('투자 생성 실패');
+            }
+        } catch (error) {
+            alert('투자 생성 실패');
+            console.error('Error:', error);
+        }
+    });
 </script>
 </body>
 </html>

@@ -18,4 +18,5 @@ public class PaymentDTO {
     private String memberEmail; // 결제자 이메일
     private Long totalPrice; // 결제 금액
 
+
 }

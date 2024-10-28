@@ -63,7 +63,7 @@ public class TestController {
         return "paymentTest";
     }
 
-    @GetMapping("/testInvestment")
+    @GetMapping("/invest")
     public String testInvestment(){
         return "investTest";
     }

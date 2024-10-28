@@ -56,11 +56,11 @@ public class VentureController {
             @RequestParam("mainProduct") String mainProduct,
             @RequestParam("typeName") String typeName,
             @RequestPart("file") MultipartFile file,
-            @CookieValue(value = "accessToken", required = false) String accessToken
+            @RequestParam("email") String email
     ) throws IOException {
         log.info("새 벤처 저장 요청 시작");
 
-        Member member = memberService.getUserDetails(accessToken);
+        Member member = memberService.findByEmail(email);
         // 입력된 form 데이터와 파일의 기본 정보 로깅
         log.info("Received data: name={}, owner={}, ventureNumber={}, mainProduct={}, typeName={}", name, owner, ventureNumber, mainProduct, typeName);
         log.info("Received file: name={}, size={} bytes, contentType={}", file.getOriginalFilename(), file.getSize(), file.getContentType());
