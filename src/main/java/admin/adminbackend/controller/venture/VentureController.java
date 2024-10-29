@@ -28,8 +28,6 @@ public class VentureController {
 
     private final VentureService ventureService;
     private final MemberService memberService;
-    private final MemberRepository memberRepository;
-    private final VentureListInfoRepository ventureListInfoRepository;
 
     /*@PostMapping("/ventures/new")
     public ResponseEntity<Long> saveVenture(@RequestBody VentureListInfoForm form) throws IOException {
@@ -62,12 +60,14 @@ public class VentureController {
 
         Member member = memberService.findByEmail(email);
         // 입력된 form 데이터와 파일의 기본 정보 로깅
-        log.info("Received data: name={}, owner={}, ventureNumber={}, mainProduct={}, typeName={}", name, owner, ventureNumber, mainProduct, typeName);
-        log.info("Received file: name={}, size={} bytes, contentType={}", file.getOriginalFilename(), file.getSize(), file.getContentType());
+        log.info("Received data: name={}, owner={}, ventureNumber={}, mainProduct={}, typeName={}", name, owner,
+                ventureNumber, mainProduct, typeName);
+        log.info("Received file: name={}, size={} bytes, contentType={}", file.getOriginalFilename(), file.getSize(),
+                file.getContentType());
 
         //VentureListInfoForm form = new VentureListInfoForm(name, owner, ventureNumber, mainProduct, typeName);
         VentureListInfoForm form = new VentureListInfoForm(mainProduct, typeName, name, owner, ventureNumber);
-        Long ventureId = ventureService.saveVenture(form, file,member);
+        Long ventureId = ventureService.saveVenture(form, file, member);
 
         // 벤처 ID 생성 후 로깅
         log.info("Venture saved with ID: {}", ventureId);
