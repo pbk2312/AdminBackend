@@ -6,10 +6,6 @@ build/
 !**/src/test/**/build/
 
 application.properties
-<<<<<<< HEAD
-=======
-
->>>>>>> Yoonseo
 ### STS ###
 .apt_generated
 .classpath
