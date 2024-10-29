@@ -1,6 +1,5 @@
 package admin.adminbackend.service.contract;
 
-import admin.adminbackend.domain.Investment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.service.investment.InvestmentService;
 import com.itextpdf.kernel.font.PdfFont;
@@ -54,7 +53,6 @@ public class ContractService {
         // PDF 초안 생성
         createContractDraft(investorData);
         String price = investorData.get("price");
-        Investment investment = investmentService.createInvestment(member.getId(), ventureId, Long.parseLong(price));
     }
 
     // 초안 PDF 생성 로직

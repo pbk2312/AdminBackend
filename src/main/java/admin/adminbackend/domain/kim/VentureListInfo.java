@@ -1,9 +1,7 @@
 package admin.adminbackend.domain.kim;
 
-import admin.adminbackend.domain.Investment;
+import admin.adminbackend.domain.InvestorInvestment;
 import admin.adminbackend.domain.Member;
-import admin.adminbackend.domain.kim.UploadFile;
-import admin.adminbackend.domain.kim.VentureApplyStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -43,7 +41,7 @@ public class VentureListInfo {
     public VentureListInfo() {
     }
 
-    public VentureListInfo(String code, String mainProduct, String area, String address, String registInstitution, String endDate, String registType, String typeName, String typeName_spc, String name, Long id, String owner, String startDate, String ventureNumber, UploadFile attachFile, String b_stt, VentureApplyStatus ventureApplyStatus, Member member, List<Investment> investments) {
+    public VentureListInfo(String code, String mainProduct, String area, String address, String registInstitution, String endDate, String registType, String typeName, String typeName_spc, String name, Long id, String owner, String startDate, String ventureNumber, UploadFile attachFile, String b_stt, VentureApplyStatus ventureApplyStatus, Member member, List<InvestorInvestment> investorInvestments) {
         this.code = code;
         this.mainProduct = mainProduct;
         this.area = area;
@@ -62,7 +60,7 @@ public class VentureListInfo {
         this.b_stt = b_stt;
         this.ventureApplyStatus = ventureApplyStatus;
         this.member = member;
-        this.investments = investments;
+        this.investorInvestments = investorInvestments;
     }
 
     @OneToOne
@@ -71,8 +69,7 @@ public class VentureListInfo {
 
 
     @OneToMany(mappedBy = "ventureListInfo")
-    private List<Investment> investments; // List to hold investments related to this VentureListInfo
+    private List<InvestorInvestment> investorInvestments; // List to hold investments related to this VentureListInfo
 
 
 }
-

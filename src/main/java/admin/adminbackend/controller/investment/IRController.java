@@ -123,7 +123,7 @@ public class IRController {
         Member getPerson = irNotification.getMember();
 
         String subject = emailProvider.createEmailSubject();
-        String body = emailProvider.createEmailBody(IRId);
+        String body = emailProvider.createEmailBody(ceo.getVentureListInfo().getId());
 
         boolean result = emailProvider.sendFileEmail(getPerson.getEmail(), subject, body, file);
 
@@ -134,22 +134,7 @@ public class IRController {
         }
     }
 
-    @GetMapping("/readIR")
-    public ResponseEntity<String> readIR(
-            @CookieValue(value = "accessToken", required = false) String accessToken,
-            @RequestParam("IRId") Long IRId) {
 
-        Member member = memberService.getUserDetails(accessToken);
-
-        IRNotification irNotification = irService.findIRSendMember(IRId);
-
-        if (irNotification != null) {
-            irService.saveIRNotification(irNotification);
-            return ResponseEntity.ok("IR 자료를 읽었습니다.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("IR 자료를 찾을 수 없습니다.");
-        }
-    }
 
 
 }

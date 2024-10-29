@@ -1,6 +1,6 @@
 package admin.adminbackend.controller.investment;
 
-import admin.adminbackend.domain.Investment;
+import admin.adminbackend.domain.InvestorInvestment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.dto.InvestmentDTO;
 import admin.adminbackend.dto.InvestmentHistoryDTO;
@@ -28,28 +28,30 @@ public class InvestmentController {
 
     @PostMapping("/createInvest")
     public ResponseEntity<?> createInvestment(
-            @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestBody InvestmentDTO investmentDTO) {
 
-        Member member = memberService.getUserDetails(accessToken);
-
+        Member member = memberService.getUserDetails(investmentDTO.getAccessToken());
         // Investment 생성
-        Investment investment = investmentService.createInvestment(
-                member.getId(),
+        InvestorInvestment investorInvestment = investmentService.createInvestment(
+                member,
                 investmentDTO.getVentureId(),
-                investmentDTO.getAmount());
+                investmentDTO.getAmount(),
+                investmentDTO.getAddress(),
+                investmentDTO.getBusinessName());
 
-        log.info("투자 생성 완료. 회원 ID: {}, 벤처 ID: {}, 투자 금액: {}", member.getId(), investmentDTO.getVentureId(), investmentDTO.getAmount());
+        log.info("투자 생성 완료. 회원 ID: {}, 벤처 ID: {}, 투자 금액: {}", member.getId(), investmentDTO.getVentureId(),
+                investmentDTO.getAmount());
 
         // InvestmentDTO로 응답 반환
         InvestmentDTO responseDTO = new InvestmentDTO();
-        responseDTO.setId(investment.getId());
-        responseDTO.setInvestmentUid(investment.getInvestmentUid());
-        responseDTO.setMemberId(member.getId());
+        responseDTO.setInvestmentUid(investorInvestment.getInvestmentUid());
         responseDTO.setVentureId(investmentDTO.getVentureId());
         responseDTO.setAmount(investmentDTO.getAmount());
-        responseDTO.setInvestedAt(investment.getInvestedAt());
-        responseDTO.setPaymentId(investment.getPayment().getId());
+        responseDTO.setInvestedAt(investorInvestment.getInvestedAt());
+        responseDTO.setPaymentId(investorInvestment.getPayment().getId());
+        responseDTO.setAddress(investorInvestment.getAddress());
+        responseDTO.setBusinessName(investmentDTO.getBusinessName());
+        responseDTO.setInvestmentId(String.valueOf(investorInvestment.getId()));
 
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
@@ -69,8 +71,21 @@ public class InvestmentController {
             return new ResponseEntity<>("투자 내역이 없습니다.", HttpStatus.NOT_FOUND);
         }
 
-
         // 성공적으로 조회한 투자 내역 DTO 반환
         return ResponseEntity.ok(investmentListByMemberId);
     }
+
+
+    @GetMapping("/ventureInvestmentHistory")
+    public ResponseEntity<?> ventureInvestmentHistory(
+            @CookieValue(value = "accessToken", required = false) String accessToken) {
+
+        Member member = memberService.getUserDetails(accessToken);
+
+        // 투자 내역 조회
+        List<InvestmentHistoryDTO> investmentHistory = investmentService.getVentureInvestmentListByMemberId(member);
+
+        return ResponseEntity.ok(investmentHistory);
+    }
+
 }
