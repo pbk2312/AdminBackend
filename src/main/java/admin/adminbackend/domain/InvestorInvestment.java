@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Investment {
+public class InvestorInvestment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,5 +40,8 @@ public class Investment {
     private String businessName; // 상호명
 
     private String address;
+
+    private String investorName;
+
 
 }

@@ -1,6 +1,5 @@
 package admin.adminbackend.service.contract;
 
-import admin.adminbackend.domain.Investment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.service.investment.InvestmentService;
 import com.itextpdf.kernel.font.PdfFont;

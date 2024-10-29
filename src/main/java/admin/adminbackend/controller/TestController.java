@@ -1,7 +1,7 @@
 package admin.adminbackend.controller;
 
 
-import admin.adminbackend.domain.Investment;
+import admin.adminbackend.domain.InvestorInvestment;
 import admin.adminbackend.dto.payment.PaymentDTO;
 import admin.adminbackend.repository.investment.InvestmentRepository;
 import admin.adminbackend.service.investment.PaymentService;
@@ -42,19 +42,19 @@ public class TestController {
 
 
         // 투자 내역 조회
-        Investment investment = investmentRepository.findById(investmentId).orElseThrow(null);
+        InvestorInvestment investorInvestment = investmentRepository.findById(investmentId).orElseThrow(null);
 
-        if (investment == null) {
+        if (investorInvestment == null) {
             log.error("투자 정보를 찾을 수 없습니다. investmentId: {}", investmentId);
             return "redirect:/error"; // 예약 정보가 없을 경우 오류 페이지로 리다이렉트
         }
 
-        String investmentUid = investment.getInvestmentUid();
+        String investmentUid = investorInvestment.getInvestmentUid();
         log.info("investmentUid: {}", investmentUid);
         PaymentDTO requestDto = paymentService.findRequestDto(investmentUid);
         requestDto.setMemberEmail(email);
-        requestDto.setVentureName(investment.getVentureListInfo().getName());
-        requestDto.setTotalPrice(investment.getPrice());
+        requestDto.setVentureName(investorInvestment.getVentureListInfo().getName());
+        requestDto.setTotalPrice(investorInvestment.getPrice());
 
 
         model.addAttribute("requestDto", requestDto);

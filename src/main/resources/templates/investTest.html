@@ -8,6 +8,9 @@
 <body>
 <h2>Create Investment</h2>
 <form id="investmentForm">
+    <label for="investorName">Investor Name:</label><br>
+    <input type="text" id="investorName" name="investorName" required><br><br>
+
     <label for="accessToken">Access Token:</label><br>
     <input type="text" id="accessToken" name="accessToken" required><br><br>
 
@@ -32,6 +35,7 @@
     document.getElementById('investmentForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
+        const investorName = document.getElementById('investorName').value;
         const accessToken = document.getElementById('accessToken').value;
         const ventureId = document.getElementById('ventureId').value;
         const amount = document.getElementById('amount').value;
@@ -44,6 +48,7 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                investorName: investorName,
                 accessToken: accessToken,
                 ventureId: ventureId,
                 amount: amount,

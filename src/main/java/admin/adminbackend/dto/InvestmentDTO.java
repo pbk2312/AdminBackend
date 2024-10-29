@@ -18,6 +18,7 @@ public class InvestmentDTO {
 
     private String address; // 주소
     private String businessName; // 상호명
+    private String investorName;
 
     private String accessToken; // 테스트 용
 

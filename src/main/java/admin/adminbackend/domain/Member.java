@@ -32,7 +32,7 @@ public class Member {
     private VentureListInfo ventureListInfo;
 
     @OneToMany(mappedBy = "investor", cascade = CascadeType.ALL, orphanRemoval = true) // Member가 삭제되면 투자내역도 삭제
-    private List<Investment> investments;
+    private List<InvestorInvestment> investorInvestments;
 
     // IRNotification 수령인 (ceo 역할)
     @OneToMany(mappedBy = "ceo", cascade = CascadeType.ALL, orphanRemoval = true)

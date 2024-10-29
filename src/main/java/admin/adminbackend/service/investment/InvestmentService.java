@@ -1,6 +1,6 @@
 package admin.adminbackend.service.investment;
 
-import admin.adminbackend.domain.Investment;
+import admin.adminbackend.domain.InvestorInvestment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.Payment;
 import admin.adminbackend.domain.PaymentStatus;
@@ -30,7 +30,7 @@ public class InvestmentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public Investment createInvestment(Member member, Long ventureId, Long price, String address, String getBusinessName
+    public InvestorInvestment createInvestment(Member member, Long ventureId, Long price, String address, String getBusinessName
     ) {
 
         // 벤처 정보(VentureListInfo) 조회
@@ -40,50 +40,51 @@ public class InvestmentService {
         Payment paymentSave = paymentRepository.save(payment);// Payment 저장
 
         // Investment 엔티티 생성
-        Investment investment = new Investment();
-        investment.setInvestmentUid(UUID.randomUUID().toString());
-        investment.setInvestor(member);
-        investment.setVentureListInfo(ventureListInfo);
-        investment.setPrice(price);
-        investment.setInvestedAt(LocalDateTime.now());
-        investment.setPayment(paymentSave);
-        investment.setAddress(address);
-        investment.setBusinessName(getBusinessName);
+        InvestorInvestment investorInvestment = new InvestorInvestment();
+        investorInvestment.setInvestmentUid(UUID.randomUUID().toString());
+        investorInvestment.setInvestor(member);
+        investorInvestment.setVentureListInfo(ventureListInfo);
+        investorInvestment.setPrice(price);
+        investorInvestment.setInvestedAt(LocalDateTime.now());
+        investorInvestment.setPayment(paymentSave);
+        investorInvestment.setAddress(address);
+        investorInvestment.setBusinessName(getBusinessName);
         // Investment 저장
-        return investmentRepository.save(investment);
+        return investmentRepository.save(investorInvestment);
     }
 
     @Transactional
     public List<InvestmentHistoryDTO> getInvestmentListByMemberId(Member member) {
         // 투자 내역 가져오기
-        List<Investment> investmentList = investmentRepository.findByMemberId(member.getId());
+        List<InvestorInvestment> investorInvestmentList = investmentRepository.findByMemberId(member.getId());
 
         // Investment -> InvestmentHistoryDTO로 변환하여 리턴
-        return investmentList.stream().map(this::convertToDto).toList();
+        return investorInvestmentList.stream().map(this::convertToDto).toList();
     }
 
     @Transactional
     public List<InvestmentHistoryDTO> getVentureInvestmentListByMemberId(Member member) {
 
-        List<Investment> investments = member.getVentureListInfo().getInvestments();
+        List<InvestorInvestment> investorInvestments = member.getVentureListInfo().getInvestorInvestments();
 
-        return investments.stream().map(this::convertToDto).collect(Collectors.toList());
+        return investorInvestments.stream().map(this::convertToDto).collect(Collectors.toList());
 
     }
 
     // Investment -> InvestmentHistoryDTO 변환 메소드
-    private InvestmentHistoryDTO convertToDto(Investment investment) {
+    private InvestmentHistoryDTO convertToDto(InvestorInvestment investorInvestment) {
         InvestmentHistoryDTO dto = new InvestmentHistoryDTO();
-        dto.setInvestmentUid(investment.getInvestmentUid());
-        dto.setAmount(investment.getPrice());
-        dto.setInvestedAt(investment.getInvestedAt());
-        dto.setPending_status(String.valueOf(investment.getPayment().getStatus()));
+        dto.setInvestmentUid(investorInvestment.getInvestmentUid());
+        dto.setAmount(investorInvestment.getPrice());
+        dto.setInvestedAt(investorInvestment.getInvestedAt());
+        dto.setPending_status(String.valueOf(investorInvestment.getPayment().getStatus()));
 
         // 투자자 이름 설정 (investment.getInvestor().getName())
-        dto.setMemberName(investment.getInvestor() != null ? investment.getInvestor().getName() : null);
+        dto.setMemberName(investorInvestment.getInvestor() != null ? investorInvestment.getInvestor().getName() : null);
 
         // 벤처 기업 이름 설정 (investment.getVentureListInfo().getVentureName())
-        dto.setVentureName(investment.getVentureListInfo() != null ? investment.getVentureListInfo().getName() : null);
+        dto.setVentureName(
+                investorInvestment.getVentureListInfo() != null ? investorInvestment.getVentureListInfo().getName() : null);
 
         return dto;
     }

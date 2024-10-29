@@ -40,7 +40,7 @@ public class Payment {
 
 
     @OneToMany(mappedBy = "payment")
-    private List<Investment> investments; // 투자 내역
+    private List<InvestorInvestment> investorInvestments; // 투자 내역
 
 
 }

@@ -1,6 +1,6 @@
 package admin.adminbackend.controller.investment;
 
-import admin.adminbackend.domain.Investment;
+import admin.adminbackend.domain.InvestorInvestment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.dto.InvestmentDTO;
 import admin.adminbackend.dto.InvestmentHistoryDTO;
@@ -32,7 +32,7 @@ public class InvestmentController {
 
         Member member = memberService.getUserDetails(investmentDTO.getAccessToken());
         // Investment 생성
-        Investment investment = investmentService.createInvestment(
+        InvestorInvestment investorInvestment = investmentService.createInvestment(
                 member,
                 investmentDTO.getVentureId(),
                 investmentDTO.getAmount(),
@@ -44,14 +44,14 @@ public class InvestmentController {
 
         // InvestmentDTO로 응답 반환
         InvestmentDTO responseDTO = new InvestmentDTO();
-        responseDTO.setInvestmentUid(investment.getInvestmentUid());
+        responseDTO.setInvestmentUid(investorInvestment.getInvestmentUid());
         responseDTO.setVentureId(investmentDTO.getVentureId());
         responseDTO.setAmount(investmentDTO.getAmount());
-        responseDTO.setInvestedAt(investment.getInvestedAt());
-        responseDTO.setPaymentId(investment.getPayment().getId());
-        responseDTO.setAddress(investment.getAddress());
+        responseDTO.setInvestedAt(investorInvestment.getInvestedAt());
+        responseDTO.setPaymentId(investorInvestment.getPayment().getId());
+        responseDTO.setAddress(investorInvestment.getAddress());
         responseDTO.setBusinessName(investmentDTO.getBusinessName());
-        responseDTO.setInvestmentId(String.valueOf(investment.getId()));
+        responseDTO.setInvestmentId(String.valueOf(investorInvestment.getId()));
 
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }

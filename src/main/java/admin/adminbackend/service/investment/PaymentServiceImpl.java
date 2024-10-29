@@ -1,6 +1,6 @@
 package admin.adminbackend.service.investment;
 
-import admin.adminbackend.domain.Investment;
+import admin.adminbackend.domain.InvestorInvestment;
 import admin.adminbackend.domain.PaymentStatus;
 import admin.adminbackend.dto.payment.PaymentCallbackRequest;
 import admin.adminbackend.dto.payment.PaymentCancelDTO;
@@ -32,13 +32,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentDTO findRequestDto(String investmentUid) {
-        Investment investment = investmentRepository.findInvestmentAndPaymentAndMember(investmentUid)
+        InvestorInvestment investorInvestment = investmentRepository.findInvestmentAndPaymentAndMember(investmentUid)
                 .orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않아요"));
 
         return PaymentDTO.builder()
                 .investmentUid(investmentUid)
-                .memberId(investment.getInvestor().getId())
-                .ventureName(investment.getVentureListInfo().getName())
+                .memberId(investorInvestment.getInvestor().getId())
+                .ventureName(investorInvestment.getVentureListInfo().getName())
                 .build();
     }
 
@@ -51,20 +51,20 @@ public class PaymentServiceImpl implements PaymentService {
             // 결제 단건 조회(아임포트)
             IamportResponse<Payment> iamportResponse = iamportClient.paymentByImpUid(request.getPaymentUid());
             // 투자 내역 조회
-            Investment investment = investmentRepository.findInvestmentAndPaymentAndMember(request.getInvestmentUid())
+            InvestorInvestment investorInvestment = investmentRepository.findInvestmentAndPaymentAndMember(request.getInvestmentUid())
                     .orElseThrow(() -> new IllegalArgumentException("투자 내역이 없습니다."));
 
             // 결제 완료가 아니면
             if (!iamportResponse.getResponse().getStatus().equals("paid")) {
                 // 주문, 결제 삭제
-                investmentRepository.delete(investment);
-                paymentRepository.delete(investment.getPayment());
+                investmentRepository.delete(investorInvestment);
+                paymentRepository.delete(investorInvestment.getPayment());
 
                 throw new RuntimeException("결제 미완료");
             }
 
             // DB에 저장된 결제 금액
-            Long price = investment.getPayment().getPrice();
+            Long price = investorInvestment.getPayment().getPrice();
             // 실 결제 금액
             int iamportPrice = iamportResponse.getResponse().getAmount().intValue();
 
@@ -72,8 +72,8 @@ public class PaymentServiceImpl implements PaymentService {
             // 결제 금액 검증
             if (iamportPrice != price) {
                 // 주문, 결제 삭제
-                investmentRepository.delete(investment);
-                paymentRepository.delete(investment.getPayment());
+                investmentRepository.delete(investorInvestment);
+                paymentRepository.delete(investorInvestment.getPayment());
 
                 // 결제금액 위변조로 의심되는 결제금액을 취소(아임포트)
                 iamportClient.cancelPaymentByImpUid(new CancelData(iamportResponse.getResponse().getImpUid(), true, new BigDecimal(iamportPrice)));
@@ -86,7 +86,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 
             // 결제 상태 변경
-            investment.getPayment().changePaymentBySuccess(PaymentStatus.COMPLETED, iamportResponse.getResponse().getImpUid());
+            investorInvestment.getPayment().changePaymentBySuccess(PaymentStatus.COMPLETED, iamportResponse.getResponse().getImpUid());
 
 
             log.info("결제 완료...");
