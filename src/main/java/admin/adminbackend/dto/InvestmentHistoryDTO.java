@@ -23,6 +23,8 @@ public class InvestmentHistoryDTO {
 
     private String ventureName; // 벤처 기업 이름 추가
 
+    private String pending_status;
+
 
 
 }

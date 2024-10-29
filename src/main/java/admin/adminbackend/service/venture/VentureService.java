@@ -82,7 +82,7 @@ public class VentureService {
         UploadFile attachFile = fileStore.storeFile(file);
 
         // 기업 상태를 조회
-        JSONObject ventureStatus = ventureStatusService.getCompanyNum(form.getVentureNumber(), member);
+        JSONObject ventureStatus = ventureStatusService.getCompanyNum(form.getVentureNumber());
         if (ventureStatus != null) {
             form.setB_stt((String) ventureStatus.get("b_stt"));
         }

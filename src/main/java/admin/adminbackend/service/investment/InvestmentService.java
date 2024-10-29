@@ -8,8 +8,8 @@ import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.repository.ventrue.VentureListInfoRepository;
 import admin.adminbackend.domain.kim.VentureListInfo;
 import admin.adminbackend.repository.investment.InvestmentRepository;
-import admin.adminbackend.repository.member.MemberRepository;
 import admin.adminbackend.repository.investment.PaymentRepository;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -26,12 +26,11 @@ import java.util.UUID;
 public class InvestmentService {
 
     private final InvestmentRepository investmentRepository;
-    private final MemberRepository memberRepository;
     private final VentureListInfoRepository ventureListInfoRepository;
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public Investment createInvestment(Member member,Long ventureId, Long price, String address,String getBusinessName
+    public Investment createInvestment(Member member, Long ventureId, Long price, String address, String getBusinessName
     ) {
 
         // 벤처 정보(VentureListInfo) 조회
@@ -63,12 +62,22 @@ public class InvestmentService {
         return investmentList.stream().map(this::convertToDto).toList();
     }
 
+    @Transactional
+    public List<InvestmentHistoryDTO> getVentureInvestmentListByMemberId(Member member) {
+
+        List<Investment> investments = member.getVentureListInfo().getInvestments();
+
+        return investments.stream().map(this::convertToDto).collect(Collectors.toList());
+
+    }
+
     // Investment -> InvestmentHistoryDTO 변환 메소드
     private InvestmentHistoryDTO convertToDto(Investment investment) {
         InvestmentHistoryDTO dto = new InvestmentHistoryDTO();
         dto.setInvestmentUid(investment.getInvestmentUid());
         dto.setAmount(investment.getPrice());
         dto.setInvestedAt(investment.getInvestedAt());
+        dto.setPending_status(String.valueOf(investment.getPayment().getStatus()));
 
         // 투자자 이름 설정 (investment.getInvestor().getName())
         dto.setMemberName(investment.getInvestor() != null ? investment.getInvestor().getName() : null);

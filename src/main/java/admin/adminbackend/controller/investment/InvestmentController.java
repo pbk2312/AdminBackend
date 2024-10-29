@@ -28,11 +28,9 @@ public class InvestmentController {
 
     @PostMapping("/createInvest")
     public ResponseEntity<?> createInvestment(
-            @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestBody InvestmentDTO investmentDTO) {
 
-        Member member = memberService.getUserDetails(accessToken);
-
+        Member member = memberService.getUserDetails(investmentDTO.getAccessToken());
         // Investment 생성
         Investment investment = investmentService.createInvestment(
                 member,
@@ -76,4 +74,18 @@ public class InvestmentController {
         // 성공적으로 조회한 투자 내역 DTO 반환
         return ResponseEntity.ok(investmentListByMemberId);
     }
+
+
+    @GetMapping("/ventureInvestmentHistory")
+    public ResponseEntity<?> ventureInvestmentHistory(
+            @CookieValue(value = "accessToken", required = false) String accessToken) {
+
+        Member member = memberService.getUserDetails(accessToken);
+
+        // 투자 내역 조회
+        List<InvestmentHistoryDTO> investmentHistory = investmentService.getVentureInvestmentListByMemberId(member);
+
+        return ResponseEntity.ok(investmentHistory);
+    }
+
 }
