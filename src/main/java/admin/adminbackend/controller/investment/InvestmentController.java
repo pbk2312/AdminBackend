@@ -44,17 +44,8 @@ public class InvestmentController {
                 investmentDTO.getAmount());
 
         // InvestmentDTO로 응답 반환
-        InvestmentDTO responseDTO = new InvestmentDTO();
-        responseDTO.setInvestmentUid(investorInvestment.getInvestmentUid());
-        responseDTO.setVentureId(investmentDTO.getVentureId());
-        responseDTO.setAmount(investmentDTO.getAmount());
-        responseDTO.setInvestedAt(investorInvestment.getInvestedAt());
-        responseDTO.setPaymentId(investorInvestment.getPayment().getId());
-        responseDTO.setAddress(investorInvestment.getAddress());
-        responseDTO.setBusinessName(investmentDTO.getBusinessName());
-        responseDTO.setInvestmentId(String.valueOf(investorInvestment.getId()));
 
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(investorInvestment.getId(), HttpStatus.CREATED);
     }
 
     @GetMapping("investmentHistory")

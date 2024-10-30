@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class InvestmentDTO {
 
-    private String investmentId;
+    private Long investmentId;
     private String investmentUid; // 투자번호
     private Long paymentId; // 결제 정보 ID
     private Long amount; // 투자 금액

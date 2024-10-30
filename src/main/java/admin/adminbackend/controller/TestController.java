@@ -2,13 +2,16 @@ package admin.adminbackend.controller;
 
 
 import admin.adminbackend.domain.InvestorInvestment;
+import admin.adminbackend.domain.Member;
 import admin.adminbackend.dto.payment.PaymentDTO;
 import admin.adminbackend.repository.investment.InvestmentRepository;
 import admin.adminbackend.service.investment.PaymentService;
+import admin.adminbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -19,6 +22,7 @@ public class TestController {
 
     private final InvestmentRepository investmentRepository;
     private final PaymentService paymentService;
+    private final MemberService memberService;
     @GetMapping("/testForm")
     public String test() {
         return "test";
@@ -36,10 +40,11 @@ public class TestController {
     @GetMapping("/paymentPage")
     public String paymentPage(
             @RequestParam("investmentId") Long investmentId,
-            @RequestParam("email") String email,
+            @CookieValue(value = "accessToken", required = false) String accessToken,
             Model model
     ) {
 
+        Member member = memberService.getUserDetails(accessToken);
 
         // 투자 내역 조회
         InvestorInvestment investorInvestment = investmentRepository.findById(investmentId).orElseThrow(null);
@@ -52,7 +57,7 @@ public class TestController {
         String investmentUid = investorInvestment.getInvestmentUid();
         log.info("investmentUid: {}", investmentUid);
         PaymentDTO requestDto = paymentService.findRequestDto(investmentUid);
-        requestDto.setMemberEmail(email);
+        requestDto.setMemberEmail(member.getEmail());
         requestDto.setVentureName(investorInvestment.getVentureListInfo().getName());
         requestDto.setTotalPrice(investorInvestment.getPrice());
 
