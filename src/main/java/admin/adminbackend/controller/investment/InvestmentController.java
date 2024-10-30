@@ -4,6 +4,7 @@ import admin.adminbackend.domain.InvestorInvestment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.dto.InvestmentDTO;
 import admin.adminbackend.dto.InvestmentHistoryDTO;
+import admin.adminbackend.dto.InvestmentResponseDTO;
 import admin.adminbackend.service.investment.InvestmentService;
 import admin.adminbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -43,9 +44,10 @@ public class InvestmentController {
         log.info("투자 생성 완료. 회원 ID: {}, 벤처 ID: {}, 투자 금액: {}", member.getId(), investmentDTO.getVentureId(),
                 investmentDTO.getAmount());
 
-        // InvestmentDTO로 응답 반환
+        // 응답 객체 생성
+        InvestmentResponseDTO responseDTO = new InvestmentResponseDTO(investorInvestment.getId());
 
-        return new ResponseEntity<>(investorInvestment.getId(), HttpStatus.CREATED);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
     @GetMapping("investmentHistory")
