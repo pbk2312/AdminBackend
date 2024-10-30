@@ -12,6 +12,7 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,8 @@ public class PaymentServiceImpl implements PaymentService {
             // 결제 단건 조회(아임포트)
             IamportResponse<Payment> iamportResponse = iamportClient.paymentByImpUid(request.getPaymentUid());
             // 투자 내역 조회
-            InvestorInvestment investorInvestment = investmentRepository.findInvestmentAndPaymentAndMember(request.getInvestmentUid())
+            InvestorInvestment investorInvestment = investmentRepository.findInvestmentAndPaymentAndMember(
+                            request.getInvestmentUid())
                     .orElseThrow(() -> new IllegalArgumentException("투자 내역이 없습니다."));
 
             // 결제 완료가 아니면
@@ -68,7 +70,6 @@ public class PaymentServiceImpl implements PaymentService {
             // 실 결제 금액
             int iamportPrice = iamportResponse.getResponse().getAmount().intValue();
 
-
             // 결제 금액 검증
             if (iamportPrice != price) {
                 // 주문, 결제 삭제
@@ -76,18 +77,17 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRepository.delete(investorInvestment.getPayment());
 
                 // 결제금액 위변조로 의심되는 결제금액을 취소(아임포트)
-                iamportClient.cancelPaymentByImpUid(new CancelData(iamportResponse.getResponse().getImpUid(), true, new BigDecimal(iamportPrice)));
+                iamportClient.cancelPaymentByImpUid(
+                        new CancelData(iamportResponse.getResponse().getImpUid(), true, new BigDecimal(iamportPrice)));
 
                 throw new RuntimeException("결제금액 위변조 의심");
             }
 
-
-            log.info("iamportResponse : {} "  , iamportResponse.getResponse().getImpUid());
-
+            log.info("iamportResponse : {} ", iamportResponse.getResponse().getImpUid());
 
             // 결제 상태 변경
-            investorInvestment.getPayment().changePaymentBySuccess(PaymentStatus.COMPLETED, iamportResponse.getResponse().getImpUid());
-
+            investorInvestment.getPayment()
+                    .changePaymentBySuccess(PaymentStatus.COMPLETED, iamportResponse.getResponse().getImpUid());
 
             log.info("결제 완료...");
             return iamportResponse;
@@ -105,45 +105,48 @@ public class PaymentServiceImpl implements PaymentService {
         return byPaymentUid;
     }
 
-    @Override
-    public void remove(String paymentUid) {
-        admin.adminbackend.domain.Payment payment = findPayment(paymentUid);
-        paymentRepository.delete(payment);
-    }
 
-
-
-    public void cancelReservation(PaymentCancelDTO paymentCancelDTO) {
+    public void cancelInvestment(PaymentCancelDTO paymentCancelDTO) {
         try {
+            // 결제 정보 확인 및 환불 처리
             IamportResponse<Payment> response = iamportClient.paymentByImpUid(paymentCancelDTO.getPaymentUid());
 
             if (response == null || response.getResponse() == null) {
                 throw new IllegalArgumentException("Invalid payment information.");
             }
 
-            // refundAmount가 Long 타입인 경우, int로 변환
+            // 환불 금액 설정
             int refundAmount = paymentCancelDTO.getCancelRequestAmount().intValue();
-
             CancelData cancelData = createCancelData(response, refundAmount);
             IamportResponse<Payment> cancelResponse = iamportClient.cancelPaymentByImpUid(cancelData);
 
-            // 환불 처리 결과에 대한 추가 로직
             if (cancelResponse.getCode() != 0) {
                 throw new RuntimeException("Failed to cancel payment: " + cancelResponse.getMessage());
             }
 
+            // 결제 취소 후 상태 업데이트
+            Payment iamportPayment = response.getResponse(); // Iamport의 Payment 객체 사용
+            admin.adminbackend.domain.Payment payment = findPayment(
+                    paymentCancelDTO.getPaymentUid()); // 도메인 Payment 객체 찾기
+            updatePaymentStatus(payment.getId(), PaymentStatus.CANCELLED);
+
+            // 투자 내역 삭제
+            Long investmentId = paymentCancelDTO.getInvestmentId();
+            Optional<InvestorInvestment> investment = investmentRepository.findById(investmentId);
+            investment.ifPresent(investmentRepository::delete);
+
         } catch (IamportResponseException e) {
-            // Iamport API 응답 예외 처리
             e.printStackTrace();
             // 적절한 오류 처리 로직
+            throw new RuntimeException("Iamport API 응답 오류가 발생했습니다.", e);
         } catch (IOException e) {
-            // I/O 예외 처리
             e.printStackTrace();
             // 적절한 오류 처리 로직
+            throw new RuntimeException("입출력 오류가 발생했습니다.", e);
         } catch (Exception e) {
-            // 기타 예외 처리
             e.printStackTrace();
             // 적절한 오류 처리 로직
+            throw new RuntimeException("결제 취소 처리 중 오류가 발생했습니다.", e);
         }
     }
 
