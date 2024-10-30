@@ -4,8 +4,6 @@ package admin.adminbackend.service.member;
 import admin.adminbackend.domain.EmailCertification;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.ResetToken;
-import admin.adminbackend.dto.MemberDTO;
-import admin.adminbackend.domain.MemberRole;
 import admin.adminbackend.dto.WithdrawalMembershipDTO;
 import admin.adminbackend.dto.email.EmailRequestDTO;
 import admin.adminbackend.dto.email.EmailResponseDTO;
@@ -16,8 +14,6 @@ import admin.adminbackend.dto.register.MemberResponseDTO;
 import admin.adminbackend.dto.token.TokenDTO;
 import admin.adminbackend.email.EmailProvider;
 import admin.adminbackend.exception.*;
-import admin.adminbackend.repository.ventrue.VentureListInfoRepository;
-import admin.adminbackend.domain.kim.VentureListInfo;
 import admin.adminbackend.repository.member.EmailRepository;
 import admin.adminbackend.repository.member.MemberRepository;
 import admin.adminbackend.jwt.TokenProvider;
@@ -49,7 +45,6 @@ public class MemberServiceImpl implements MemberService {
     private final EmailProvider emailProvider;
     private final EmailRepository emailRepository;
     private final ResetTokenRepository resetTokenRepository;
-    private final VentureListInfoRepository ventureListInfoRepository;
 
 
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
@@ -74,7 +69,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         // 인증번호 확인 후 회원 가입 진행
-        Member member = memberRequestDTO.toMember(passwordEncoder,memberRequestDTO);
+        Member member = memberRequestDTO.toMember(passwordEncoder, memberRequestDTO);
         Member savedMember = memberRepository.save(member);
 
         emailRepository.delete(emailCertification);
@@ -233,19 +228,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
-    public void registerMemberWithVenture(Member member) {
-        // 1. Member 테이블에 회원 정보 저장
-        Member savedMember = memberRepository.save(member);
-
-        // 2. 만약 회원의 역할이 VENTURE라면 VentureListInfo도 생성 및 저장
-        if (member.getMemberRole() == MemberRole.VENTURE) {
-            VentureListInfo ventureListInfo = new VentureListInfo();
-            ventureListInfo.setMember(savedMember); // Member와 연결
-            ventureListInfoRepository.save(ventureListInfo);
-            log.info("Venture information saved for member ID: {}", savedMember.getId());
-        }
-    }
-
     public Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElse(null); // 존재하지 않으면 null 반환
@@ -276,17 +258,6 @@ public class MemberServiceImpl implements MemberService {
         return sb.toString();
     }
 
-    @Transactional
-    public void updateMember(Member member, MemberDTO mypageMemberDTO) {
-        // 개인정보 수정
-        member.setName(mypageMemberDTO.getName());
-        member.setPhoneNumber(mypageMemberDTO.getPhoneNumber());
-        member.setDateOfBirth(mypageMemberDTO.getDateOfBirth());
-
-        // 저장 (업데이트)
-        memberRepository.save(member);
-    }
-
 
     // 임시 비밀번호 생성 메서드
     private String generateResetToken() {
@@ -300,8 +271,5 @@ public class MemberServiceImpl implements MemberService {
         return sb.toString();
     }
 
-    @Override
-    public Member saveMember(Member member) {
-        return null;
-    }
+
 }
