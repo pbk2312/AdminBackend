@@ -107,7 +107,7 @@ public class EmailProvider {
     }
 
     public String createEmailBody(Long ventureId) {
-        String readUrl = "http://localhost:8080/invest?ventureId=" + ventureId;
+        String readUrl = "http://localhost:3000/investPage/" + ventureId;
         return "안녕하세요,<br><br>첨부된 파일을 확인해 주세요.<br>" +
                 "IR 자료를 읽으시고 투지를 진행하실거면 해당 링크를 클릭해주세요: <a href=\"" + readUrl + "\">" + readUrl + "</a>";
     }

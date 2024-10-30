@@ -28,9 +28,10 @@ public class InvestmentController {
 
     @PostMapping("/createInvest")
     public ResponseEntity<?> createInvestment(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestBody InvestmentDTO investmentDTO) {
 
-        Member member = memberService.getUserDetails(investmentDTO.getAccessToken());
+        Member member = memberService.getUserDetails(accessToken);
         // Investment 생성
         InvestorInvestment investorInvestment = investmentService.createInvestment(
                 member,
