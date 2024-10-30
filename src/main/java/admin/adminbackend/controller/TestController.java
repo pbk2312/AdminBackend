@@ -9,6 +9,8 @@ import admin.adminbackend.service.investment.PaymentService;
 import admin.adminbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -38,34 +40,30 @@ public class TestController {
 
 
     @GetMapping("/paymentPage")
-    public String paymentPage(
+    public ResponseEntity<?> paymentPage(
             @RequestParam("investmentId") Long investmentId,
-            @CookieValue(value = "accessToken", required = false) String accessToken,
-            Model model
+            @CookieValue(value = "accessToken", required = false) String accessToken
     ) {
 
         Member member = memberService.getUserDetails(accessToken);
 
         // 투자 내역 조회
-        InvestorInvestment investorInvestment = investmentRepository.findById(investmentId).orElseThrow(null);
-
-        if (investorInvestment == null) {
+        InvestorInvestment investorInvestment = investmentRepository.findById(investmentId).orElseThrow(() -> {
             log.error("투자 정보를 찾을 수 없습니다. investmentId: {}", investmentId);
-            return "redirect:/error"; // 예약 정보가 없을 경우 오류 페이지로 리다이렉트
-        }
+            return new RuntimeException("투자 정보를 찾을 수 없습니다.");
+        });
 
         String investmentUid = investorInvestment.getInvestmentUid();
         log.info("investmentUid: {}", investmentUid);
         PaymentDTO requestDto = paymentService.findRequestDto(investmentUid);
+
+        // PaymentDTO에 필요한 정보 세팅
         requestDto.setMemberEmail(member.getEmail());
         requestDto.setVentureName(investorInvestment.getVentureListInfo().getName());
         requestDto.setTotalPrice(investorInvestment.getPrice());
 
-
-        model.addAttribute("requestDto", requestDto);
-
-        // 결제 페이지로 이동
-        return "paymentTest";
+        // JSON 응답 반환
+        return new ResponseEntity<>(requestDto, HttpStatus.OK);
     }
 
     @GetMapping("/invest")

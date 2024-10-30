@@ -7,7 +7,5 @@ public class InvestmentResponseDTO {
         this.investmentId = investmentId;
     }
 
-    public Long getInvestmentId() {
-        return investmentId;
-    }
+
 }
