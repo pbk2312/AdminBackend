@@ -1,6 +1,6 @@
 package admin.adminbackend.domain.kim;
 
-import admin.adminbackend.domain.InvestorInvestment;
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.domain.Member;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -62,6 +62,27 @@ public class VentureListInfo {
         this.member = member;
         this.investorInvestments = investorInvestments;
     }
+
+    //생성자 추가 (repository에서 일부 필드만 가져옴)
+    public VentureListInfo(String code, String mainProduct, String area, String address, String registInstitution,
+                           String endDate, String registType, String typeName, String typeName_spc,
+                           String name, Long id, String owner, String startDate, String ventureNumber) {
+        this.code = code;
+        this.mainProduct = mainProduct;
+        this.area = area;
+        this.address = address;
+        this.registInstitution = registInstitution;
+        this.endDate = endDate;
+        this.registType = registType;
+        this.typeName = typeName;
+        this.typeName_spc = typeName_spc;
+        this.name = name;
+        this.id = id;
+        this.owner = owner;
+        this.startDate = startDate;
+        this.ventureNumber = ventureNumber;
+    }
+
 
     @OneToOne
     @JoinColumn(name = "member_id", nullable = true)
