@@ -2,6 +2,7 @@
 package admin.adminbackend.domain;
 
 
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,8 @@ public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "payment_id")
+    private Long paymentId;
 
 
     private Long price; // 투자 결제 금액

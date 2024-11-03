@@ -25,6 +25,4 @@ public interface PaymentService {
 
     void updatePaymentStatus(Long paymentId, PaymentStatus status);
 
-
-
 }

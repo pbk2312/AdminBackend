@@ -1,11 +1,11 @@
 package admin.adminbackend.service.investment;
 
-import admin.adminbackend.domain.InvestorInvestment;
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.domain.PaymentStatus;
 import admin.adminbackend.dto.payment.PaymentCallbackRequest;
 import admin.adminbackend.dto.payment.PaymentCancelDTO;
 import admin.adminbackend.dto.payment.PaymentDTO;
-import admin.adminbackend.repository.investment.InvestmentRepository;
+import admin.adminbackend.investcontract.repository.InvestorInvestmentRepository;
 import admin.adminbackend.repository.investment.PaymentRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -26,13 +26,13 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    private final InvestmentRepository investmentRepository;
+    private final InvestorInvestmentRepository investorInvestmentRepository;
     private final PaymentRepository paymentRepository;
     private final IamportClient iamportClient;
 
     @Override
     public PaymentDTO findRequestDto(String investmentUid) {
-        InvestorInvestment investorInvestment = investmentRepository.findInvestmentAndPaymentAndMember(investmentUid)
+        InvestorInvestment investorInvestment = investorInvestmentRepository.findInvestmentAndPaymentAndMember(investmentUid)
                 .orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않아요"));
 
         return PaymentDTO.builder()
@@ -51,13 +51,13 @@ public class PaymentServiceImpl implements PaymentService {
             // 결제 단건 조회(아임포트)
             IamportResponse<Payment> iamportResponse = iamportClient.paymentByImpUid(request.getPaymentUid());
             // 투자 내역 조회
-            InvestorInvestment investorInvestment = investmentRepository.findInvestmentAndPaymentAndMember(request.getInvestmentUid())
+            InvestorInvestment investorInvestment = investorInvestmentRepository.findInvestmentAndPaymentAndMember(request.getInvestmentUid())
                     .orElseThrow(() -> new IllegalArgumentException("투자 내역이 없습니다."));
 
             // 결제 완료가 아니면
             if (!iamportResponse.getResponse().getStatus().equals("paid")) {
                 // 주문, 결제 삭제
-                investmentRepository.delete(investorInvestment);
+                investorInvestmentRepository.delete(investorInvestment);
                 paymentRepository.delete(investorInvestment.getPayment());
 
                 throw new RuntimeException("결제 미완료");
@@ -72,7 +72,7 @@ public class PaymentServiceImpl implements PaymentService {
             // 결제 금액 검증
             if (iamportPrice != price) {
                 // 주문, 결제 삭제
-                investmentRepository.delete(investorInvestment);
+                investorInvestmentRepository.delete(investorInvestment);
                 paymentRepository.delete(investorInvestment.getPayment());
 
                 // 결제금액 위변조로 의심되는 결제금액을 취소(아임포트)

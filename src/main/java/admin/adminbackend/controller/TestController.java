@@ -1,9 +1,9 @@
 package admin.adminbackend.controller;
 
 
-import admin.adminbackend.domain.InvestorInvestment;
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.dto.payment.PaymentDTO;
-import admin.adminbackend.repository.investment.InvestmentRepository;
+import admin.adminbackend.investcontract.repository.InvestorInvestmentRepository;
 import admin.adminbackend.service.investment.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class TestController {
 
-    private final InvestmentRepository investmentRepository;
+    private final InvestorInvestmentRepository investorInvestmentRepository;
     private final PaymentService paymentService;
     @GetMapping("/testForm")
     public String test() {
@@ -42,7 +42,7 @@ public class TestController {
 
 
         // 투자 내역 조회
-        InvestorInvestment investorInvestment = investmentRepository.findById(investmentId).orElseThrow(null);
+        InvestorInvestment investorInvestment = investorInvestmentRepository.findById(investmentId).orElseThrow(null);
 
         if (investorInvestment == null) {
             log.error("투자 정보를 찾을 수 없습니다. investmentId: {}", investmentId);
