@@ -85,7 +85,10 @@ public class VentureService {
         JSONObject ventureStatus = ventureStatusService.getCompanyNum(form.getVentureNumber());
         if (ventureStatus != null) {
             form.setB_stt((String) ventureStatus.get("b_stt"));
+        } else {
+            form.setB_stt(null);
         }
+        log.info("b_stt:{}", form.getB_stt());
 
         // member 기업 승급
         member.setMemberRole(MemberRole.VENTURE);
