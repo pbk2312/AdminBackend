@@ -35,7 +35,7 @@ public class VentureStatusService {
                 .addHeader("Content-Type", "application/json")
                 .build();
 
-        //결과 탐색
+        // 결과 탐색
         try {
             Response response = client.newCall(request).execute();
             String responseBody = response.body().string();
@@ -44,28 +44,36 @@ public class VentureStatusService {
 
             JSONObject jsonResponse = UtilService.stringToJson(responseBody);
             JSONArray dataArray = (JSONArray) jsonResponse.get("data");
+            String b_stt = null; // b_stt를 초기화
+
+            // b_stt만 포함된 JSON 응답 생성
+            JSONObject result = new JSONObject();
+
             if (dataArray != null && !dataArray.isEmpty()) {
                 JSONObject dataObject = (JSONObject) dataArray.get(0);
-                String b_stt = (String) dataObject.get("b_stt");
-                log.info("b_stt: {}", b_stt);
+                b_stt = (String) dataObject.get("b_stt"); // b_stt 값을 가져옴
 
-                // b_stt만 포함된 JSON 응답 생성
-                JSONObject result = new JSONObject();
-                result.put("b_stt", b_stt);
-
-                // 여기다가 기업 승급
-
-
-                return result;
-
+                // b_stt가 빈 문자열일 경우 null로 변환
+                if (b_stt.isEmpty()) {
+                    b_stt = null;
+                    log.info("b_stt가 빈 문자열.. null로 반환");
+                } else {
+                    log.info("b_stt: {}", b_stt);
+                }
             } else {
                 log.error("Data array is null or empty");
-                //return null;
-                JSONObject errorResponse = new JSONObject();
-                errorResponse.put("error", "No data found");
-                return errorResponse;
+                // 데이터가 없을 경우에도 빈 JSON 응답을 생성
+                result.put("b_stt", null); // b_stt를 null로 설정
             }
-        } catch (Exception e) {
+
+            result.put("b_stt", b_stt); // b_stt가 null일 경우 null로 저장
+
+            // 여기다가 기업 승급
+
+            return result;
+
+        }
+        catch (Exception e) {
             log.error("Error occurred: {}", e.getMessage());
             UtilService.ExceptionValue(e.getMessage(), VentureStatusController.class);
             //return null;

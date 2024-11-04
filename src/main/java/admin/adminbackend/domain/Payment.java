@@ -1,3 +1,4 @@
+
 package admin.adminbackend.domain;
 
 
@@ -17,7 +18,8 @@ public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "payment_id")
+    private Long paymentId;
 
 
     private Long price; // 투자 결제 금액

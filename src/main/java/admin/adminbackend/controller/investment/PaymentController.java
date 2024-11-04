@@ -1,12 +1,12 @@
 package admin.adminbackend.controller.investment;
 
 
-import admin.adminbackend.domain.InvestorInvestment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.dto.payment.PaymentCallbackRequest;
 import admin.adminbackend.dto.payment.PaymentCancelDTO;
 import admin.adminbackend.dto.payment.PaymentDTO;
-import admin.adminbackend.repository.investment.InvestmentRepository;
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
+import admin.adminbackend.investcontract.repository.InvestorInvestmentRepository;
 import admin.adminbackend.service.investment.PaymentService;
 import admin.adminbackend.service.member.MemberService;
 import com.siot.IamportRestClient.response.IamportResponse;
@@ -25,7 +25,7 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final MemberService memberService;
-    private final InvestmentRepository investmentRepository;
+    private final InvestorInvestmentRepository investmentRepository;
 
 
     @GetMapping("/payment")

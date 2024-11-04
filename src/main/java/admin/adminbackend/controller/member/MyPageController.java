@@ -5,7 +5,7 @@ import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.dto.MemberDTO;
 
 import admin.adminbackend.dto.ResponseDTO;
-import admin.adminbackend.service.investment.InvestmentService;
+import admin.adminbackend.investcontract.service.InvestmentService;
 import admin.adminbackend.service.member.MemberServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;

@@ -95,7 +95,7 @@ public class VentureListService {
     }
 
     public VentureListInfo getCompanyById(Long id) {
-        return ventureListInfoRepository.findById(id)
+        return ventureListInfoRepository.findPartialInfoById(id) //수정
                 .orElseThrow(() -> new CompanyNotFoundException("해당 ID로 회사를 찾을 수 없습니다."));
     }
 

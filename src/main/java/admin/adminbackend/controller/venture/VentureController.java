@@ -80,11 +80,11 @@ public class VentureController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/ventures/{id}")
+    /*@GetMapping("/ventures/{id}")
     public ResponseEntity<VentureListInfo> ventures(@PathVariable Long id) {
         VentureListInfo ventureListInfo = ventureService.getVentureById(id);
         return ResponseEntity.ok(ventureListInfo);
-    }
+    }*/
 
     @GetMapping("/attach/{id}")
     public ResponseEntity<Resource> downloadAttach(@PathVariable Long id) throws MalformedURLException {

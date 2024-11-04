@@ -1,19 +1,14 @@
 package admin.adminbackend.controller;
 
 
-import admin.adminbackend.domain.InvestorInvestment;
-import admin.adminbackend.domain.Member;
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.dto.payment.PaymentDTO;
-import admin.adminbackend.repository.investment.InvestmentRepository;
+import admin.adminbackend.investcontract.repository.InvestorInvestmentRepository;
 import admin.adminbackend.service.investment.PaymentService;
-import admin.adminbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -22,9 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class TestController {
 
-    private final InvestmentRepository investmentRepository;
+    private final InvestorInvestmentRepository investorInvestmentRepository;
     private final PaymentService paymentService;
-    private final MemberService memberService;
     @GetMapping("/testForm")
     public String test() {
         return "test";
@@ -40,34 +34,38 @@ public class TestController {
 
 
     @GetMapping("/paymentPage")
-    public ResponseEntity<?> paymentPage(
+    public String paymentPage(
             @RequestParam("investmentId") Long investmentId,
-            @CookieValue(value = "accessToken", required = false) String accessToken
+            @RequestParam("email") String email,
+            Model model
     ) {
 
-        Member member = memberService.getUserDetails(accessToken);
 
         // 투자 내역 조회
-        InvestorInvestment investorInvestment = investmentRepository.findById(investmentId).orElseThrow(() -> {
+        InvestorInvestment investorInvestment = investorInvestmentRepository.findById(investmentId).orElseThrow(null);
+
+        if (investorInvestment == null) {
             log.error("투자 정보를 찾을 수 없습니다. investmentId: {}", investmentId);
-            return new RuntimeException("투자 정보를 찾을 수 없습니다.");
-        });
+            return "redirect:/error"; // 예약 정보가 없을 경우 오류 페이지로 리다이렉트
+        }
 
         String investmentUid = investorInvestment.getInvestmentUid();
         log.info("investmentUid: {}", investmentUid);
         PaymentDTO requestDto = paymentService.findRequestDto(investmentUid);
-
-        // PaymentDTO에 필요한 정보 세팅
-        requestDto.setMemberEmail(member.getEmail());
+        requestDto.setMemberEmail(email);
         requestDto.setVentureName(investorInvestment.getVentureListInfo().getName());
         requestDto.setTotalPrice(investorInvestment.getPrice());
 
-        // JSON 응답 반환
-        return new ResponseEntity<>(requestDto, HttpStatus.OK);
+
+        model.addAttribute("requestDto", requestDto);
+
+        // 결제 페이지로 이동
+        return "paymentTest";
     }
 
     @GetMapping("/invest")
     public String testInvestment(){
         return "investTest";
     }
+
 }
