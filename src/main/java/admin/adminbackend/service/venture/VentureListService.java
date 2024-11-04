@@ -3,6 +3,8 @@ package admin.adminbackend.service.venture;
 import admin.adminbackend.repository.ventrue.VentureListInfoRepository;
 import admin.adminbackend.domain.kim.VentureListInfo;
 import admin.adminbackend.exception.CompanyNotFoundException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONArray;
@@ -23,7 +25,8 @@ import java.net.URL;
 @RequiredArgsConstructor
 public class VentureListService {
 
-
+    @PersistenceContext
+    private EntityManager entityManager;
     private final VentureListInfoRepository ventureListInfoRepository;
     @Transactional
     public JSONArray callApi(int page) {
@@ -94,11 +97,22 @@ public class VentureListService {
         return ventureListInfoRepository.findAll(pageable);
     }
 
+    @Transactional
     public VentureListInfo getCompanyById(Long id) {
-        return ventureListInfoRepository.findPartialInfoById(id) //수정
-                .orElseThrow(() -> new CompanyNotFoundException("해당 ID로 회사를 찾을 수 없습니다."));
+        // entityManager를 사용하여 영속성 컨텍스트에서 직접 조회
+        VentureListInfo ventureListInfo = entityManager.find(VentureListInfo.class, id);
+
+        if (ventureListInfo == null) {
+            throw new CompanyNotFoundException("해당 ID로 회사를 찾을 수 없습니다.");
+        }
+
+        // 필요한 경우 refresh 수행 (이제는 영속 상태임)
+        entityManager.refresh(ventureListInfo);
+
+        return ventureListInfo;
     }
-
-
-
 }
+
+
+
+

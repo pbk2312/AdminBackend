@@ -1,11 +1,11 @@
 package admin.adminbackend.domain.kim;
 
-import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.domain.Member;
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.Data;
 
-import java.util.List;
 
 @Entity
 @Data
@@ -83,8 +83,7 @@ public class VentureListInfo {
         this.ventureNumber = ventureNumber;
     }
 
-
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = true)
     private Member member;
 
