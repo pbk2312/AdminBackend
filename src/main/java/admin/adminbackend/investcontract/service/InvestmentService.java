@@ -76,6 +76,7 @@ public class InvestmentService {
         }
 
         // investorInvestmentDTO에서 paymentId 가져오기
+        log.info("DTO paymentId:{}", investorInvestmentDTO.getPaymentId());
         Long paymentId = investorInvestmentDTO.getPaymentId();
         if (paymentId != null) {
             // paymentId를 이용해 Payment 엔티티 조회
@@ -86,8 +87,9 @@ public class InvestmentService {
                 Payment payment = paymentOptional.get();
 
                 // 조회된 Payment 엔티티에 대한 추가 처리 로직
-                //log.info("Payment found: " + payment);
+                log.info("Payment found: " + payment);
                 investorInvestment.setPayment(payment);
+                log.info("엔티티 paymentId:{}", investorInvestment.getPayment().getPaymentId());
 
             } else {
                 // paymentId에 해당하는 엔티티가 없을 경우 처리
@@ -95,7 +97,7 @@ public class InvestmentService {
             }
         } else {
             // paymentId가 null일 경우 예외 처리 또는 다른 로직 수행
-            System.out.println("No paymentId provided in investorInvestmentDTO.");
+            log.info("No paymentId provided in investorInvestmentDTO.");
         }
 
         investorInvestment.setInvestedAt(LocalDateTime.now());
