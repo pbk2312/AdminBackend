@@ -1,5 +1,6 @@
 package admin.adminbackend.investcontract.service;
 
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.domain.Payment;
 import admin.adminbackend.domain.PaymentStatus;

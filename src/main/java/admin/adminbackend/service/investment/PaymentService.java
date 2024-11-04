@@ -18,11 +18,10 @@ public interface PaymentService {
 
     admin.adminbackend.domain.Payment findPayment(String paymentUid);
 
-    void remove(String paymentUid);
+    void cancelInvestment(PaymentCancelDTO paymentCancelDTO);
 
-
-    void cancelReservation(PaymentCancelDTO paymentCancelDTO);
 
     void updatePaymentStatus(Long paymentId, PaymentStatus status);
+
 
 }

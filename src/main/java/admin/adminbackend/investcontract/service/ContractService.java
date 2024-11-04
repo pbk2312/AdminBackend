@@ -2,6 +2,7 @@ package admin.adminbackend.investcontract.service;
 
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.investcontract.domain.ContractInvestment;
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.investcontract.domain.VentureInvestment;
 import admin.adminbackend.investcontract.dto.ContractInvestmentDTO;
 import admin.adminbackend.investcontract.dto.InvestorInvestmentDTO;

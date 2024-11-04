@@ -1,6 +1,7 @@
 package admin.adminbackend.investcontract.controller;
 
 import admin.adminbackend.domain.Member;
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.investcontract.dto.InvestorInvestmentDTO;
 import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.investcontract.dto.VentureInvestmentDTO;

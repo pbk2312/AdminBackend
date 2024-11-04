@@ -2,6 +2,7 @@
 package admin.adminbackend.domain;
 
 
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
