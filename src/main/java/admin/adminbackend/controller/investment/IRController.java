@@ -42,7 +42,7 @@ public class IRController {
             // 쿠키에서 인증 정보 가져오기
             Member member = memberService.getUserDetails(accessToken);
             VentureListInfo ventureInfo = ventureListInfoService.getCompanyById(ventureId);
-
+            log.info("ventureInfo : {} ", ventureInfo.getMember().getName());
             Member CEO = ventureInfo.getMember(); // 대표님
             boolean success = irService.IRSend(CEO, member, ventureInfo);
 

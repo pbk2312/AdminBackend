@@ -1,14 +1,11 @@
 package admin.adminbackend.controller.member;
 
 import admin.adminbackend.domain.Member;
-import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.dto.MemberDTO;
 
 import admin.adminbackend.dto.ResponseDTO;
-import admin.adminbackend.investcontract.service.InvestmentService;
 import admin.adminbackend.service.member.MemberServiceImpl;
 import jakarta.servlet.http.HttpSession;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 
 
 @RestController
@@ -27,7 +23,6 @@ public class MyPageController {
 
     private final MemberServiceImpl memberService;
     private final PasswordEncoder passwordEncoder;
-    private final InvestmentService investmentService;
 
 
     // 비밀번호 확인
@@ -68,21 +63,6 @@ public class MyPageController {
 
 
 
-    @GetMapping("/investmentHistory")
-    public ResponseEntity<ResponseDTO<List<InvestmentHistoryDTO>>> getInvestmentHistory(
-            @CookieValue(value = "accessToken", required = false) String accessToken) {
-
-        // 회원 정보 가져오기
-        Member member = memberService.getUserDetails(accessToken);
-
-        // 투자 내역 가져오기 (Investment -> InvestmentHistoryDTO로 변환된 리스트)
-        List<InvestmentHistoryDTO> investmentListByMemberId = investmentService.getInvestmentListByMemberId(member);
-
-        // ResponseDTO 객체 생성 - 메시지와 데이터를 함께 전달
-        ResponseDTO<List<InvestmentHistoryDTO>> response = new ResponseDTO<>("투자 내역 조회 성공", investmentListByMemberId);
-
-        return ResponseEntity.ok(response);
-    }
 
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {

@@ -83,14 +83,13 @@ public class VentureListInfo {
         this.ventureNumber = ventureNumber;
     }
 
-
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = true)
     private Member member;
 
 
     @OneToMany(mappedBy = "ventureListInfo")
-    private List<InvestorInvestment> investorInvestments; // List to hold investments related to this VentureListInfo
+    private List<InvestorInvestment> investorInvestments;
 
 
 }

@@ -2,11 +2,13 @@ package admin.adminbackend.controller.investment;
 
 
 import admin.adminbackend.domain.Member;
+import admin.adminbackend.domain.kim.VentureListInfo;
 import admin.adminbackend.dto.payment.PaymentCallbackRequest;
 import admin.adminbackend.dto.payment.PaymentCancelDTO;
 import admin.adminbackend.dto.payment.PaymentDTO;
 import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.investcontract.repository.InvestorInvestmentRepository;
+import admin.adminbackend.investcontract.service.InvestmentService;
 import admin.adminbackend.service.investment.PaymentService;
 import admin.adminbackend.service.member.MemberService;
 import com.siot.IamportRestClient.response.IamportResponse;
@@ -26,6 +28,7 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final MemberService memberService;
     private final InvestorInvestmentRepository investmentRepository;
+    private final InvestmentService investmentService;
 
 
     @GetMapping("/payment")
@@ -90,4 +93,18 @@ public class PaymentController {
                     .body("결제 취소 요청 처리 중 알 수 없는 오류가 발생했습니다.");
         }
     }
+
+    @GetMapping("/venture-total-price")
+    public ResponseEntity<Long> getTotalCompletedInvestment(@CookieValue(value = "accessToken", required = false) String accessToken) {
+
+        Member member = memberService.getUserDetails(accessToken);
+
+        VentureListInfo ventureListInfo = member.getVentureListInfo();
+        Long totalCompletedInvestment = investmentService.getPrice(ventureListInfo);
+
+        return ResponseEntity.ok(totalCompletedInvestment);
+    }
+
+
+
 }

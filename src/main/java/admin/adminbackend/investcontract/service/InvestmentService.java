@@ -14,12 +14,8 @@ import admin.adminbackend.domain.kim.VentureListInfo;
 import admin.adminbackend.investcontract.repository.InvestorInvestmentRepository;
 import admin.adminbackend.repository.investment.PaymentRepository;
 
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import admin.adminbackend.service.investment.PaymentService;
-import admin.adminbackend.service.member.MemberService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -39,11 +35,9 @@ public class InvestmentService {
     private final VentureListInfoRepository ventureListInfoRepository;
     private final PaymentRepository paymentRepository;
     private final VentureInvestmentRepository ventureInvestmentRepository;
-    private final MemberService memberService;
-    private final PaymentService paymentService;
 
 
-    public void saveInvestorInvestment(InvestorInvestmentDTO investorInvestmentDTO) {
+    public void saveInvestorInvestment(InvestorInvestmentDTO investorInvestmentDTO, Member member) {
         // DTO를 엔티티로 변환
         InvestorInvestment investorInvestment = new InvestorInvestment();
         //investorInvestment.setId(investorInvestmentDTO.getId());
@@ -65,40 +59,10 @@ public class InvestmentService {
             throw new IllegalArgumentException("Venture Id cannot be null");
         }
 
-        // memberId를 사용하여 Member 엔티티 조회
-        Long memberId = investorInvestmentDTO.getMemberId();
-        if (memberId != null) {
-            Member investor = memberService.getMemberById(memberId); // MemberService에서 ID로 Member 조회
-            investorInvestment.setInvestor(investor); // Member 엔티티를 InvestorInvestment에 설정
-        } else {
-            // memberId가 null인 경우의 처리 (예: 예외 발생 또는 기본값 설정)
-            throw new IllegalArgumentException("Member ID cannot be null");
-        }
+        investorInvestment.setInvestor(member); // Member 엔티티를 InvestorInvestment에 설정
 
         // investorInvestmentDTO에서 paymentId 가져오기
         log.info("DTO paymentId:{}", investorInvestmentDTO.getPaymentId());
-        Long paymentId = investorInvestmentDTO.getPaymentId();
-        if (paymentId != null) {
-            // paymentId를 이용해 Payment 엔티티 조회
-            Optional<Payment> paymentOptional = paymentRepository.findById(paymentId);
-
-            if (paymentOptional.isPresent()) {
-                // payment 엔티티가 존재할 경우
-                Payment payment = paymentOptional.get();
-
-                // 조회된 Payment 엔티티에 대한 추가 처리 로직
-                log.info("Payment found: " + payment);
-                investorInvestment.setPayment(payment);
-                log.info("엔티티 paymentId:{}", investorInvestment.getPayment().getPaymentId());
-
-            } else {
-                // paymentId에 해당하는 엔티티가 없을 경우 처리
-                throw new EntityNotFoundException("Payment not found with id: " + paymentId);
-            }
-        } else {
-            // paymentId가 null일 경우 예외 처리 또는 다른 로직 수행
-            log.info("No paymentId provided in investorInvestmentDTO.");
-        }
 
         investorInvestment.setInvestedAt(LocalDateTime.now());
         investorInvestment.setInvestmentUid(UUID.randomUUID().toString());
@@ -123,15 +87,14 @@ public class InvestmentService {
             ventureInvestment.setVentureListInfo(ventureInfo);
         }
 
-
-
         // 데이터베이스에 저장
         ventureInvestmentRepository.save(ventureInvestment);
     }
 
 
     @Transactional
-    public InvestorInvestment createInvestment(Member member, Long ventureId, Long price, String address, String getBusinessName
+    public InvestorInvestment createInvestment(Member member, Long ventureId, Long price, String address,
+                                               String getBusinessName
     ) {
 
         // 벤처 정보(VentureListInfo) 조회
@@ -185,8 +148,20 @@ public class InvestmentService {
 
         // 벤처 기업 이름 설정 (investment.getVentureListInfo().getVentureName())
         dto.setVentureName(
-                investorInvestment.getVentureListInfo() != null ? investorInvestment.getVentureListInfo().getName() : null);
+                investorInvestment.getVentureListInfo() != null ? investorInvestment.getVentureListInfo().getName()
+                        : null);
 
         return dto;
     }
+
+
+
+    @Transactional(readOnly = true)
+    public Long getPrice(VentureListInfo ventureListInfo) {
+        return ventureListInfo.getInvestorInvestments().stream()
+                .filter(investment -> investment.getPayment().getStatus() == PaymentStatus.COMPLETED)
+                .mapToLong(InvestorInvestment::getPrice)
+                .sum();
+    }
+
 }
