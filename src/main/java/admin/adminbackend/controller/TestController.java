@@ -54,7 +54,7 @@ public class TestController {
         PaymentDTO requestDto = paymentService.findRequestDto(investmentUid);
         requestDto.setMemberEmail(email);
         requestDto.setVentureName(investorInvestment.getVentureListInfo().getName());
-        requestDto.setTotalPrice(investorInvestment.getPrice());
+        requestDto.setTotalPrice(investorInvestment.getTotalPrice());
 
 
         model.addAttribute("requestDto", requestDto);

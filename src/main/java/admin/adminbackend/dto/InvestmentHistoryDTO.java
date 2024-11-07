@@ -25,5 +25,13 @@ public class InvestmentHistoryDTO {
 
     private String pending_status;
 
+    private String paymentUid;
+
+    private Long ventureId;
+
+    private Long investorId;
+
+
+
 
 }

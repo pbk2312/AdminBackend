@@ -18,5 +18,6 @@ public class VentureInvestmentDTO {
     private Long investorId; // 투자자 (회원) ID
     private Long paymentId; // 결제 정보 ID
     private Long ventureId; // 벤처 정보 ID
+    private Long ventureInvestmentId;
 
 }

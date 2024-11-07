@@ -91,7 +91,7 @@ public class ContractService {
         InvestorInvestmentDTO investorDTO = new InvestorInvestmentDTO();
         investorDTO.setInvestorName(contract.getInvestorInvestment().getInvestor().getName());
         investorDTO.setAddress(contract.getInvestorInvestment().getAddress());
-        investorDTO.setPrice(contract.getInvestorInvestment().getPrice());
+        investorDTO.setPrice(contract.getInvestorInvestment().getTotalPrice());
         investorDTO.setBusinessName(contract.getInvestorInvestment().getBusinessName());
         // 다른 필드 설정
         dto.setInvestorInvestmentDTO(investorDTO);

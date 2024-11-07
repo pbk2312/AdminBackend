@@ -21,7 +21,7 @@ public class InvestorInvestment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     //private Long InvestorId; // 투자자 ID 추가??
-    private Long price; // 투자 금액
+    private Long totalPrice; // 투자 금액
     private String investmentUid; // 투자번호
     private LocalDateTime investedAt; // 투자 시각
     private String businessName; // 상호명

@@ -1,8 +1,8 @@
 package admin.adminbackend.investcontract.controller;
 
-import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.domain.Member;
-import admin.adminbackend.investcontract.domain.VentureInvestment;
+import admin.adminbackend.dto.ResponseDTO;
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.investcontract.dto.InvestorInvestmentDTO;
 import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.investcontract.dto.VentureInvestmentDTO;
@@ -28,16 +28,20 @@ public class InvestmentController {
     private final MemberService memberService;
 
     @PostMapping("/submitInvestor")
-    public ResponseEntity<?> submitInvestor(@RequestBody InvestorInvestmentDTO investorInvestmentDTO) {
+    public ResponseEntity<?> submitInvestor(@RequestBody InvestorInvestmentDTO investorInvestmentDTO,
+                                            @CookieValue(value = "accessToken", required = false) String accessToken
+    ) {
+
+        Member member = memberService.getUserDetails(accessToken);
         /*log.info("투자자가 입력한 정보 전송됨. " +
                         "투자자ID : {}, 대표명 : {}, 금액 : {}, 주소 : {}, 상호명 : {}",
                 investorInvestmentDTO.getInvestorId(), investorInvestmentDTO.getInvestorName(),
                 investorInvestmentDTO.getPrice(), investorInvestmentDTO.getAddress(),
                 investorInvestmentDTO.getBusinessName());*/
         // 서비스 호출하여 데이터 저장
-        investmentService.saveInvestorInvestment(investorInvestmentDTO);
+        investmentService.saveInvestorInvestment(investorInvestmentDTO,member);
         log.info("투자자가 입력한 정보 저장됨. " +
-                "투자자ID:{}, 대표명:{}, 금액:{}, 주소:{}, 상호명:{}",
+                        "투자자ID:{}, 대표명:{}, 금액:{}, 주소:{}, 상호명:{}",
                 investorInvestmentDTO.getMemberId(), investorInvestmentDTO.getInvestorName(),
                 investorInvestmentDTO.getPrice(), investorInvestmentDTO.getAddress(),
                 investorInvestmentDTO.getBusinessName());
@@ -47,24 +51,32 @@ public class InvestmentController {
     }
 
     @PostMapping("/submitVenture")
-    public ResponseEntity<?> submitVenture(@RequestBody VentureInvestmentDTO ventureInvestmentDTO) {
+    public ResponseEntity<?> submitVenture(@RequestBody VentureInvestmentDTO ventureInvestmentDTO,
+                                           @CookieValue(value = "accessToken", required = false) String accessToken) {
+        Member member = memberService.getUserDetails(accessToken);
+        Long ventureId = member.getVentureListInfo().getId();
         log.info("기업이 입력한 정보 전송됨. 기업ID : {}, 대표명 : {}, 주소 : {}, 상호명 : {}",
-                ventureInvestmentDTO.getVentureId(), ventureInvestmentDTO.getName(),
+                ventureId, ventureInvestmentDTO.getName(),
                 ventureInvestmentDTO.getAddress(), ventureInvestmentDTO.getBusinessName());
+        ventureInvestmentDTO.setVentureId(ventureId);
         // 서비스 호출하여 데이터 저장
-        investmentService.saveVentureInvestment(ventureInvestmentDTO);
+        Long investmentId = investmentService.saveVentureInvestment(ventureInvestmentDTO, member);
         log.info("기업이 입력한 정보 저장됨. 기업ID : {}, 대표명 : {}, 주소 : {}, 상호명 : {}",
                 ventureInvestmentDTO.getVentureId(), ventureInvestmentDTO.getName(),
                 ventureInvestmentDTO.getAddress(), ventureInvestmentDTO.getBusinessName());
+        ventureInvestmentDTO.setVentureInvestmentId(investmentId);
+
+        log.info("investmentId : {} " ,investmentId);
 
         return ResponseEntity.ok(ventureInvestmentDTO);
     }
 
     @PostMapping("/createInvest")
     public ResponseEntity<?> createInvestment(
+            @CookieValue(value = "accessToken", required = false) String accessToken,
             @RequestBody InvestorInvestmentDTO investmentDTO) {
 
-        Member member = memberService.getUserDetails(investmentDTO.getAccessToken());
+        Member member = memberService.getUserDetails(accessToken);
         // Investment 생성
         InvestorInvestment investorInvestment = investmentService.createInvestment(
                 member,
@@ -78,36 +90,36 @@ public class InvestmentController {
 
         // InvestmentDTO로 응답 반환
         InvestorInvestmentDTO responseDTO = new InvestorInvestmentDTO();
-        //responseDTO.setInvestmentUid(investorInvestment.getInvestmentUid());
+        responseDTO.setInvestmentUid(investorInvestment.getInvestmentUid());
         responseDTO.setVentureId(investmentDTO.getVentureId());
         responseDTO.setPrice(investmentDTO.getPrice());
-        //responseDTO.setInvestedAt(investorInvestment.getInvestedAt());
+        responseDTO.setInvestedAt(investorInvestment.getInvestedAt());
         responseDTO.setPaymentId(investorInvestment.getPayment().getPaymentId());
         responseDTO.setAddress(investorInvestment.getAddress());
         responseDTO.setBusinessName(investmentDTO.getBusinessName());
-        //responseDTO.setInvestorId(String.valueOf(investorInvestment.getId()));
-        //responseDTO.setInvestorId(investorInvestment.getId());
+        responseDTO.setInvestorId(investorInvestment.getId());
+        responseDTO.setId(investorInvestment.getId());
+        log.info("responseDTO : {} " ,responseDTO);
 
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(responseDTO.getId(), HttpStatus.CREATED);
     }
 
-    @GetMapping("investmentHistory")
-    public ResponseEntity<?> investmentHistory(
-            @CookieValue(value = "accessToken", required = false) String accessToken
-    ) {
-        // Member 정보 조회
+
+    @GetMapping("/investmentHistory")
+    public ResponseEntity<ResponseDTO<List<InvestmentHistoryDTO>>> getInvestmentHistory(
+            @CookieValue(value = "accessToken", required = false) String accessToken) {
+
+        // 회원 정보 가져오기
         Member member = memberService.getUserDetails(accessToken);
 
-        // 해당 회원의 투자 내역 조회
+        // 투자 내역 가져오기 (Investment -> InvestmentHistoryDTO로 변환된 리스트)
         List<InvestmentHistoryDTO> investmentListByMemberId = investmentService.getInvestmentListByMemberId(member);
 
-        if (investmentListByMemberId.isEmpty()) {
-            // 투자 내역이 없을 때 404 응답과 메시지 반환
-            return new ResponseEntity<>("투자 내역이 없습니다.", HttpStatus.NOT_FOUND);
-        }
+        // ResponseDTO 객체 생성 - 메시지와 데이터를 함께 전달
+        ResponseDTO<List<InvestmentHistoryDTO>> response = new ResponseDTO<>("투자 내역 조회 성공", investmentListByMemberId);
 
-        // 성공적으로 조회한 투자 내역 DTO 반환
-        return ResponseEntity.ok(investmentListByMemberId);
+
+        return ResponseEntity.ok(response);
     }
 
 
@@ -119,6 +131,8 @@ public class InvestmentController {
 
         // 투자 내역 조회
         List<InvestmentHistoryDTO> investmentHistory = investmentService.getVentureInvestmentListByMemberId(member);
+
+
 
         return ResponseEntity.ok(investmentHistory);
     }
