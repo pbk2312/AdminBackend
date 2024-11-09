@@ -78,7 +78,7 @@ public class ContractService {
         VentureInvestmentDTO ventureInvestmentDTO = contractDTO.getVentureInvestmentDTO();
 
         // PDF 생성 로직
-        pdfGenerator.generateFinalContract(contract.getContractId(), contractDTO, investorInvestmentDTO, ventureInvestmentDTO, ownerPassword, userPassword);
+        pdfGenerator.generateFinalContract(contract.getId(), contract.getContractId(), contractDTO, investorInvestmentDTO, ventureInvestmentDTO, ownerPassword, userPassword);
     }
 
     private ContractInvestmentDTO convertToDTO(ContractInvestment contract) {

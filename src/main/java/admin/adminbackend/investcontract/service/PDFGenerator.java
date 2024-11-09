@@ -1,8 +1,10 @@
 package admin.adminbackend.investcontract.service;
 
+import admin.adminbackend.investcontract.domain.ContractInvestment;
 import admin.adminbackend.investcontract.dto.ContractInvestmentDTO;
 import admin.adminbackend.investcontract.dto.InvestorInvestmentDTO;
 import admin.adminbackend.investcontract.dto.VentureInvestmentDTO;
+import admin.adminbackend.investcontract.repository.ContractInvestmentRepository;
 import com.itextpdf.forms.PdfAcroForm;
 import com.itextpdf.forms.fields.PdfFormField;
 import com.itextpdf.kernel.font.PdfFont;
@@ -14,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
+import org.jetbrains.annotations.Contract;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,10 +34,14 @@ public class PDFGenerator {
     @Value("${file.storage.path}")
     private String storagePath;
 
+    @Autowired
+    private ContractInvestmentRepository contractInvestmentRepository;
+
     // 최종 계약서 생성 및 암호화
-    public void generateFinalContract(String contractId, ContractInvestmentDTO contractDTO,
+    public void generateFinalContract(Long Id, String contractId, ContractInvestmentDTO contractDTO,
                                       InvestorInvestmentDTO investorDTO, VentureInvestmentDTO ventureDTO,
                                       String ownerPassword, String userPassword) throws IOException {
+        log.info("Id: {}", Id);
         log.info("contractId: {}", contractId);
         String filledFilePath = storagePath + "contract_" + contractId + ".pdf";
         String protectedFilePath = storagePath + "protected_contract_" + contractId + ".pdf";
@@ -46,6 +54,13 @@ public class PDFGenerator {
 
         log.info("계약서 완성본 저장 경로: " + filledFilePath);
         log.info("암호화된 계약서 완성본 저장 경로: " + protectedFilePath);
+
+        // 계약서 상태 업데이트
+        ContractInvestment contract = contractInvestmentRepository.findById(Id)
+                .orElseThrow(() -> new IllegalArgumentException("Contract not found for ID: " + Id));
+        contract.setGenerated(true); // 계약서 생성 완료 상태로 설정
+        contractInvestmentRepository.save(contract);
+        log.info("계약서 상태 업데이트 완료: 계약서 생성 완료 상태로 설정됨.");
     }
 
     // PDF 양식으로 계약서 생성

@@ -1,15 +1,14 @@
 package admin.adminbackend.investcontract.controller;
 
+import admin.adminbackend.investcontract.domain.InvestorInvestment;
+import admin.adminbackend.investcontract.repository.ContractInvestmentRepository;
+import admin.adminbackend.investcontract.repository.InvestorInvestmentRepository;
 import admin.adminbackend.investcontract.service.ContractService;
-import admin.adminbackend.service.member.MemberService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -18,9 +17,13 @@ import java.util.Map;
 public class ContractController {
 
     private final ContractService contractService;
+    private final ContractInvestmentRepository contractInvestmentRepository;
+    private final InvestorInvestmentRepository investorInvestmentRepository;
 
-    public ContractController(ContractService contractService) {
+    public ContractController(ContractService contractService, ContractInvestmentRepository contractInvestmentRepository, InvestorInvestmentRepository investorInvestmentRepository) {
         this.contractService = contractService;
+        this.contractInvestmentRepository = contractInvestmentRepository;
+        this.investorInvestmentRepository = investorInvestmentRepository;
     }
 
     @PostMapping("/create-contract")
@@ -39,5 +42,23 @@ public class ContractController {
             return ResponseEntity.status(500).body("계약서 생성 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
+
+    @GetMapping("/contract/check-new")
+    public ResponseEntity<Map<String, Boolean>> checkNewContract(@RequestParam Long investorId) {
+        // investorId로 InvestorInvestment 조회 (Optional로 반환)
+        InvestorInvestment investorInvestment = investorInvestmentRepository.findById(investorId)
+                .orElseThrow(() -> new IllegalArgumentException("InvestorInvestment not found for investorId: " + investorId));
+
+        // 해당 InvestorInvestment의 ID로 관련된 ContractInvestment 조회
+        Long investorInvestmentId = investorInvestment.getId();
+        boolean hasNewContract = contractInvestmentRepository.existsByInvestorInvestmentIdAndIsGenerated(investorInvestmentId, true);
+
+        // 결과 반환
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("hasNewContract", hasNewContract);
+
+        return ResponseEntity.ok(response);
+    }
+
 
 }
