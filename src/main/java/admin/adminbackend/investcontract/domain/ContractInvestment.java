@@ -20,6 +20,7 @@ public class ContractInvestment {
     private String contractId; // 계약서 ID
 
     private boolean isGenerated;  //계약서 생성 여부
+    private String filePath;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "investor_investment_id", nullable = false)

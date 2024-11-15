@@ -1,12 +1,15 @@
 package admin.adminbackend.investcontract.controller;
 
 import admin.adminbackend.domain.Member;
+import admin.adminbackend.domain.kim.VentureListInfo;
 import admin.adminbackend.dto.ResponseDTO;
 import admin.adminbackend.investcontract.domain.InvestorInvestment;
 import admin.adminbackend.investcontract.dto.InvestorInvestmentDTO;
 import admin.adminbackend.dto.InvestmentHistoryDTO;
 import admin.adminbackend.investcontract.dto.VentureInvestmentDTO;
 import admin.adminbackend.investcontract.service.InvestmentService;
+import admin.adminbackend.repository.investment.PaymentRepository;
+import admin.adminbackend.repository.ventrue.VentureListInfoRepository;
 import admin.adminbackend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +30,8 @@ public class InvestmentController {
 
     private final InvestmentService investmentService;
     private final MemberService memberService;
+    private final PaymentRepository paymentRepository;
+
 
     @PostMapping("/submitInvestor")
     public ResponseEntity<?> submitInvestor(@RequestBody InvestorInvestmentDTO investorInvestmentDTO,
@@ -39,7 +45,7 @@ public class InvestmentController {
                 investorInvestmentDTO.getPrice(), investorInvestmentDTO.getAddress(),
                 investorInvestmentDTO.getBusinessName());*/
         // 서비스 호출하여 데이터 저장
-        investmentService.saveInvestorInvestment(investorInvestmentDTO,member);
+        investmentService.saveInvestorInvestment(investorInvestmentDTO, member);
         log.info("투자자가 입력한 정보 저장됨. " +
                         "투자자ID:{}, 대표명:{}, 금액:{}, 주소:{}, 상호명:{}",
                 investorInvestmentDTO.getMemberId(), investorInvestmentDTO.getInvestorName(),
@@ -66,7 +72,7 @@ public class InvestmentController {
                 ventureInvestmentDTO.getAddress(), ventureInvestmentDTO.getBusinessName());
         ventureInvestmentDTO.setVentureInvestmentId(investmentId);
 
-        log.info("investmentId : {} " ,investmentId);
+        log.info("investmentId : {} ", investmentId);
 
         return ResponseEntity.ok(ventureInvestmentDTO);
     }
@@ -99,7 +105,7 @@ public class InvestmentController {
         responseDTO.setBusinessName(investmentDTO.getBusinessName());
         responseDTO.setInvestorId(investorInvestment.getId());
         responseDTO.setId(investorInvestment.getId());
-        log.info("responseDTO : {} " ,responseDTO);
+        log.info("responseDTO : {} ", responseDTO);
 
         return new ResponseEntity<>(responseDTO.getId(), HttpStatus.CREATED);
     }
@@ -112,6 +118,8 @@ public class InvestmentController {
         // 회원 정보 가져오기
         Member member = memberService.getUserDetails(accessToken);
 
+
+
         // 투자 내역 가져오기 (Investment -> InvestmentHistoryDTO로 변환된 리스트)
         List<InvestmentHistoryDTO> investmentListByMemberId = investmentService.getInvestmentListByMemberId(member);
 
@@ -123,6 +131,8 @@ public class InvestmentController {
     }
 
 
+
+
     @GetMapping("/ventureInvestmentHistory")
     public ResponseEntity<?> ventureInvestmentHistory(
             @CookieValue(value = "accessToken", required = false) String accessToken) {
@@ -131,7 +141,6 @@ public class InvestmentController {
 
         // 투자 내역 조회
         List<InvestmentHistoryDTO> investmentHistory = investmentService.getVentureInvestmentListByMemberId(member);
-
 
 
         return ResponseEntity.ok(investmentHistory);

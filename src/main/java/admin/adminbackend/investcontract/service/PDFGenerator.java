@@ -38,7 +38,7 @@ public class PDFGenerator {
     private ContractInvestmentRepository contractInvestmentRepository;
 
     // 최종 계약서 생성 및 암호화
-    public void generateFinalContract(Long Id, String contractId, ContractInvestmentDTO contractDTO,
+    public String generateFinalContract(Long Id, String contractId, ContractInvestmentDTO contractDTO,
                                       InvestorInvestmentDTO investorDTO, VentureInvestmentDTO ventureDTO,
                                       String ownerPassword, String userPassword) throws IOException {
         log.info("Id: {}", Id);
@@ -59,8 +59,13 @@ public class PDFGenerator {
         ContractInvestment contract = contractInvestmentRepository.findById(Id)
                 .orElseThrow(() -> new IllegalArgumentException("Contract not found for ID: " + Id));
         contract.setGenerated(true); // 계약서 생성 완료 상태로 설정
+        contract.setFilePath(protectedFilePath); // 파일 경로 저장
         contractInvestmentRepository.save(contract);
         log.info("계약서 상태 업데이트 완료: 계약서 생성 완료 상태로 설정됨.");
+
+        // 다운로드 링크 반환
+        return "/download/contract/" + contractId;
+        //return contractId;
     }
 
     // PDF 양식으로 계약서 생성

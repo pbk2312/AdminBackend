@@ -27,7 +27,7 @@ public class VentureInvestment {
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    private Member investor; // 투자자 (회원)
+    private Member ceo; // 대표자 (회원)
 
     @ManyToOne
     @JoinColumn(name = "payment_id")

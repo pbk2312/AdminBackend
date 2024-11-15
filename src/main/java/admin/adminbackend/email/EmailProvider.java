@@ -106,10 +106,32 @@ public class EmailProvider {
         return "[스타트업 투자 플랫폼] IR 자료";
     }
 
-    public String createEmailBody(Long IRId) {
-        String readUrl = "http://localhost:8080/invest?IRId=" + IRId;
+    public String createEmailBody(Long ventureId) {
+        String readUrl = "http://localhost:3000/investPage/" + ventureId;
         return "안녕하세요,<br><br>첨부된 파일을 확인해 주세요.<br>" +
                 "IR 자료를 읽으시고 투지를 진행하실거면 해당 링크를 클릭해주세요: <a href=\"" + readUrl + "\">" + readUrl + "</a>";
+    }
+
+    public boolean sendContractEmail(String to,String contractUrl) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
+
+            // Setting the email content
+            String emailBody = "안녕하세요,<br><br>계약서를 저장하려면 아래 링크를 클릭하세요:<br>" +
+                    "<a href=\"" + "http://localhost:8080" + contractUrl + "\">" + contractUrl + "</a>";
+
+            messageHelper.setTo(to);
+            messageHelper.setText(emailBody, true);
+            messageHelper.setSubject("[스타트업 투자 플랫폼] 계약서 확인 요청");
+
+            // Sending the email
+            javaMailSender.send(message);
+            return true;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

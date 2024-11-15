@@ -102,6 +102,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public admin.adminbackend.domain.Payment findPayment(String paymentUid) {
         admin.adminbackend.domain.Payment byPaymentUid = paymentRepository.findByPaymentUid(paymentUid);
+
+
         return byPaymentUid;
     }
 

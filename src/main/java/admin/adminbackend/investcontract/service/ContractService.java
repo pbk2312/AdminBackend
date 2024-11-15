@@ -39,7 +39,7 @@ public class ContractService {
     }
 
     // 계약 생성 메소드
-    public void createContract(Long investorId, Long ventureId) throws IOException {
+    public ContractInvestment createContract(Long investorId, Long ventureId) throws IOException {
         // 투자자 정보 조회
         InvestorInvestment investorInvestment = investorInvestmentRepository.findById(investorId)
                 .orElseThrow(() -> new RuntimeException("투자자를 찾을 수 없습니다."));
@@ -62,12 +62,15 @@ public class ContractService {
 
         // 계약 저장
         contractInvestmentRepository.save(contract);
-
         log.info("투자자 정보:{}", investorInvestment);
 
         // PDF 생성 및 저장
         createContractWithPDF(contract, ownerPassword, userPassword);
+
+        // 생성된 계약 객체 반환
+        return contract;
     }
+
 
     private void createContractWithPDF(ContractInvestment contract, String ownerPassword, String userPassword) throws IOException {
         // 계약 정보를 DTO로 변환
