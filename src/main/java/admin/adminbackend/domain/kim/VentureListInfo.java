@@ -2,6 +2,7 @@ package admin.adminbackend.domain.kim;
 
 import admin.adminbackend.domain.Member;
 import admin.adminbackend.investcontract.domain.InvestorInvestment;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class VentureListInfo {
     //private String ventureName; //기업명
     //private String ownerName; //대표자명
     private String ventureNumber; //사업자 등록번호
+    @JsonIgnore // 이 필드는 응답에 포함되지 않음
     private UploadFile attachFile; //첨부파일
     //private List<MultipartFile> imageFiles;
 
@@ -85,10 +87,12 @@ public class VentureListInfo {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = true)
+    @JsonIgnore // 이 필드는 응답에 포함되지 않음
     private Member member;
 
 
     @OneToMany(mappedBy = "ventureListInfo")
+    @JsonIgnore // 이 필드는 응답에 포함되지 않음
     private List<InvestorInvestment> investorInvestments; // List to hold investments related to this VentureListInfo
 
 
