@@ -16,7 +16,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Service
@@ -51,7 +50,6 @@ public class ContractService {
 
         // Member에서 생년월일 조회
         Member member = investorInvestment.getInvestor();
-        //String userPassword = member.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyyMMdd")); // 생년월일로 설정
         String userPassword = generateRandomPassword(); // 랜덤 비밀번호 생성
         String ownerPassword = "admin123"; // 고정된 암호 설정
         log.info("계약서 암호 user:{}, owner:{}", userPassword, ownerPassword);

@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import java.util.List;
 import lombok.Data;
 
-
 @Entity
 @Data
 public class VentureListInfo {
@@ -27,14 +26,10 @@ public class VentureListInfo {
     private Long id; //연번
     private String owner; //대표자명
     private String startDate; //벤처유효시작일
-
-    //private String ventureName; //기업명
-    //private String ownerName; //대표자명
     private String ventureNumber; //사업자 등록번호
+
     @JsonIgnore // 이 필드는 응답에 포함되지 않음
     private UploadFile attachFile; //첨부파일
-    //private List<MultipartFile> imageFiles;
-
     private String b_stt; // 사업자 상태 필드 추가
 
     @Enumerated(EnumType.STRING)

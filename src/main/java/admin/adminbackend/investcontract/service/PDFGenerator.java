@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
-import org.jetbrains.annotations.Contract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -65,14 +64,12 @@ public class PDFGenerator {
 
         // 다운로드 링크 반환
         return "/download/contract/" + contractId;
-        //return contractId;
     }
 
     // PDF 양식으로 계약서 생성
     private void createContract(String outputFilePath, ContractInvestmentDTO contractDTO,
                                 InvestorInvestmentDTO investorDTO, VentureInvestmentDTO ventureDTO) throws IOException {
-        //String templatePath = "D:/Admin/ProtectedFileStore/test4.pdf"; // 템플릿 경로 설정
-        String templatePath = "src/main/resources/templates/test4.pdf";
+        String templatePath = "src/main/resources/templates/test4.pdf";  /// 템플릿 경로 설정
         try (PdfDocument pdfDoc = new PdfDocument(new PdfReader(templatePath), new PdfWriter(outputFilePath))) {
             PdfAcroForm form = PdfAcroForm.getAcroForm(pdfDoc, true);
             if (form == null) {

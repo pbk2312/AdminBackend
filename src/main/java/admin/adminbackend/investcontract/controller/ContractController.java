@@ -32,7 +32,6 @@ public class ContractController {
     private final ContractInvestmentRepository contractInvestmentRepository;
     private final InvestorInvestmentRepository investorInvestmentRepository;
 
-
     @PostMapping("/create-contract")
     public ResponseEntity<Map<String, String>> createContract(@RequestBody Map<String, Long> request) {
         try {
@@ -50,7 +49,6 @@ public class ContractController {
 
             emailProvider.sendContractEmail(investorEmail, contractUrl, userPassword);
 
-
             // contractId를 포함한 JSON 형태의 응답 반환
             Map<String, String> response = new HashMap<>();
             response.put("message", "계약서가 성공적으로 생성되었습니다.");
@@ -62,9 +60,6 @@ public class ContractController {
             response.put("isGenerated", String.valueOf(contract.isGenerated()));
             response.put("RandomPassword(userPassord)", userPassword);
 
-
-
-
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // 예외 처리
@@ -74,9 +69,7 @@ public class ContractController {
         }
     }
 
-
-    @GetMapping("/contract/check-new") //오빠가 투자자 폼 입력할때 investorId를 저장하고 나중에 꺼낼수 있나?
-    //안되면 토큰으로 받아서 memberId 로? 그럼 밑에랑 다른 코드도 수정..?
+    @GetMapping("/contract/check-new")
     public ResponseEntity<Map<String, Boolean>> checkNewContract(@RequestParam Long investorId) {
         // investorId로 InvestorInvestment 조회 (Optional로 반환)
         InvestorInvestment investorInvestment = investorInvestmentRepository.findById(investorId)
@@ -92,28 +85,6 @@ public class ContractController {
 
         return ResponseEntity.ok(response);
     }
-
-    /*@GetMapping("/contract/check-new")
-    public ResponseEntity<Map<String, Boolean>> checkNewContract(@CookieValue(name = "memberId") Long memberId) {
-        // memberId로 InvestorInvestment 조회 (Optional로 반환)
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found for memberId: " + memberId));
-
-        InvestorInvestment investorInvestment = investorInvestmentRepository.findByMember(member)
-                .orElseThrow(() -> new IllegalArgumentException("InvestorInvestment not found for memberId: " + memberId));
-
-        // 해당 InvestorInvestment의 ID로 관련된 ContractInvestment 조회
-        Long investorInvestmentId = investorInvestment.getId();
-        boolean hasNewContract = contractInvestmentRepository.existsByInvestorInvestmentIdAndIsGenerated(investorInvestmentId, true);
-
-        // 결과 반환
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("hasNewContract", hasNewContract);
-
-        return ResponseEntity.ok(response);
-    }*/
-
-
 
     // 계약서 다운로드 엔드포인트
     @GetMapping("/contract/{contractId}")

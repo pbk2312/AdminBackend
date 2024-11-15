@@ -13,8 +13,6 @@ public class ContractInvestmentDTO {
     private String contractId; // 계약서 ID
     private Long investorInvestmentId; // 투자자 투자 정보 ID
     private Long ventureInvestmentId; // 벤처 투자 정보 ID
-
-    // 추가된 필드
     private InvestorInvestmentDTO investorInvestmentDTO; // 투자자 DTO
     private VentureInvestmentDTO ventureInvestmentDTO;   // 벤처 DTO
 }

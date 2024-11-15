@@ -88,10 +88,6 @@ public class VentureListService {
         return result;
     }
 
-    /*public VentureListInfo getCompanyByName(String name) {
-        return ventureListInfoRepository.findByName(name);
-    }*/
-
     public Page<VentureListInfo> getAllVentureList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ventureListInfoRepository.findAll(pageable);

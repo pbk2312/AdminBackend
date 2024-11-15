@@ -118,8 +118,6 @@ public class EmailProvider {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
 
             // Setting the email content
-            /*String emailBody = "안녕하세요,<br><br>계약서를 저장하려면 아래 링크를 클릭하세요:<br>" +
-                    "<a href=\"" + "http://localhost:8080" + contractUrl + "\">" + contractUrl + "</a>";*/
             String emailBody = "안녕하세요,<br><br>" +
                     "계약서를 확인하려면 아래 링크를 클릭하세요:<br>" +
                     "<a href=\"http://localhost:8080" + contractUrl + "\">" + contractUrl + "</a><br><br>" +

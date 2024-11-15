@@ -20,7 +20,6 @@ public class InvestorInvestment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //private Long InvestorId; // 투자자 ID 추가??
     private Long totalPrice; // 투자 금액
     private String investmentUid; // 투자번호
     private LocalDateTime investedAt; // 투자 시각
@@ -39,6 +38,5 @@ public class InvestorInvestment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venture_id")
     private VentureListInfo ventureListInfo;  //기업 정보
-
 
 }

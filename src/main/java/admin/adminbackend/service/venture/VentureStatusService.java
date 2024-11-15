@@ -1,6 +1,5 @@
 package admin.adminbackend.service.venture;
 
-import admin.adminbackend.domain.Member;
 import admin.adminbackend.controller.venture.VentureStatusController;
 import admin.adminbackend.util.UtilService;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,7 @@ public class VentureStatusService {
         List<String> arry = new ArrayList<>();
         arry.add(b_no); //{} 객체, [{},{},{}] 배열(객체 묶음)
         JSONObject requestBody = new JSONObject();
-        requestBody.put("b_no",arry); //b_no 배열 이름, 객체 1개
+        requestBody.put("b_no", arry); //b_no 배열 이름, 객체 1개
         log.info("b_no={}", arry);
 
         RequestBody body = RequestBody.create(requestBody.toString(),mediaType);
@@ -67,8 +66,6 @@ public class VentureStatusService {
             }
 
             result.put("b_stt", b_stt); // b_stt가 null일 경우 null로 저장
-
-            // 여기다가 기업 승급
 
             return result;
 

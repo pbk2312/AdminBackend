@@ -11,9 +11,7 @@ import java.util.Optional;
 
 public interface VentureListInfoRepository extends JpaRepository<VentureListInfo,Long> {
 
-    //VentureListInfo findByName(String name); //기업 정보 조회
-
-    Optional<VentureListInfo>   findById(Long id); //기업 정보 조회
+    Optional<VentureListInfo> findById(Long id); //기업 정보 조회
 
     @Query("SELECT new admin.adminbackend.domain.kim.VentureListInfo(v.code, v.mainProduct, v.area, v.address, v.registInstitution, " +
             "v.endDate, v.registType, v.typeName, v.typeName_spc, v.name, v.id, v.owner, v.startDate, v.ventureNumber) " +

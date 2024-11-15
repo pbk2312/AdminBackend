@@ -1,12 +1,9 @@
 package admin.adminbackend.controller.venture;
 
 import admin.adminbackend.domain.Member;
-import admin.adminbackend.domain.kim.VentureListInfo;
 import admin.adminbackend.service.venture.VentureService;
 import admin.adminbackend.service.member.MemberService;
-import admin.adminbackend.repository.ventrue.VentureListInfoRepository;
 
-import admin.adminbackend.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -28,25 +25,6 @@ public class VentureController {
 
     private final VentureService ventureService;
     private final MemberService memberService;
-    private final MemberRepository memberRepository;
-    private final VentureListInfoRepository ventureListInfoRepository;
-
-    /*@PostMapping("/ventures/new")
-    public ResponseEntity<Long> saveVenture(@RequestBody VentureListInfoForm form) throws IOException {
-        Long ventureId = ventureService.saveVenture(form);
-        return ResponseEntity.ok(ventureId);
-    }*/
-
-//    @PostMapping(value = "/ventures/new", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public ResponseEntity<Map<String, Long>> saveVenture(
-//            @RequestPart("form") VentureListInfoForm form,
-//            @RequestPart("file") MultipartFile file
-//    ) throws IOException {
-//        Long ventureId = ventureService.saveVenture(form, file);
-//        Map<String, Long> response = new HashMap<>();
-//        response.put("ventureId", ventureId);
-//        return ResponseEntity.ok(response);
-//    }
 
     @PostMapping(value = "/ventures/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Long>> saveVenture(
@@ -61,11 +39,11 @@ public class VentureController {
         log.info("새 벤처 저장 요청 시작");
 
         Member member = memberService.findByEmail(email);
+
         // 입력된 form 데이터와 파일의 기본 정보 로깅
         log.info("Received data: name={}, owner={}, ventureNumber={}, mainProduct={}, typeName={}", name, owner, ventureNumber, mainProduct, typeName);
         log.info("Received file: name={}, size={} bytes, contentType={}", file.getOriginalFilename(), file.getSize(), file.getContentType());
 
-        //VentureListInfoForm form = new VentureListInfoForm(name, owner, ventureNumber, mainProduct, typeName);
         VentureListInfoForm form = new VentureListInfoForm(mainProduct, typeName, name, owner, ventureNumber);
         Long ventureId = ventureService.saveVenture(form, file,member);
 
@@ -79,12 +57,6 @@ public class VentureController {
 
         return ResponseEntity.ok(response);
     }
-
-    /*@GetMapping("/ventures/{id}")
-    public ResponseEntity<VentureListInfo> ventures(@PathVariable Long id) {
-        VentureListInfo ventureListInfo = ventureService.getVentureById(id);
-        return ResponseEntity.ok(ventureListInfo);
-    }*/
 
     @GetMapping("/attach/{id}")
     public ResponseEntity<Resource> downloadAttach(@PathVariable Long id) throws MalformedURLException {

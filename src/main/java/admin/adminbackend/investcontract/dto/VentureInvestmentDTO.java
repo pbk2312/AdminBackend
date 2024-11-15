@@ -11,7 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class VentureInvestmentDTO {
 
-    //private Long id;
     private String name; // 대표명
     private String address; // 주소
     private String businessName; // 상호명

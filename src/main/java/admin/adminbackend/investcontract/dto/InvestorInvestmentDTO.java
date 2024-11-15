@@ -27,9 +27,7 @@ public class InvestorInvestmentDTO {
     private String investorName;  //대표자명
 
     private LocalDate dateOfBirth;
-
     private String accessToken; // 테스트 용
-
     private Long memberId;
 
 

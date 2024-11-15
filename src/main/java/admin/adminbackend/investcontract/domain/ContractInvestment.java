@@ -18,7 +18,6 @@ public class ContractInvestment {
     private Long id;
 
     private String contractId; // 계약서 ID
-
     private boolean isGenerated;  //계약서 생성 여부
     private String filePath;
     private String randomPassword;

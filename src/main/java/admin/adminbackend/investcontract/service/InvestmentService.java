@@ -40,14 +40,10 @@ public class InvestmentService {
     public void saveInvestorInvestment(InvestorInvestmentDTO investorInvestmentDTO, Member member) {
         // DTO를 엔티티로 변환
         InvestorInvestment investorInvestment = new InvestorInvestment();
-        //investorInvestment.setId(investorInvestmentDTO.getId());
         investorInvestment.setInvestorName(investorInvestmentDTO.getInvestorName());
         investorInvestment.setTotalPrice(investorInvestmentDTO.getPrice());
         investorInvestment.setAddress(investorInvestmentDTO.getAddress());
         investorInvestment.setBusinessName(investorInvestmentDTO.getBusinessName());
-        //investorInvestment.setInvestmentUid(investorInvestmentDTO.getInvestmentUid());
-        //investorInvestment.setInvestedAt(investorInvestmentDTO.getInvestedAt());
-        // 추가 필드 설정...
 
         // ventureId를 사용하여 VentureListInfo 객체 설정
         if (investorInvestmentDTO.getVentureId() != null) {
@@ -79,26 +75,21 @@ public class InvestmentService {
         ventureInvestment.setName(ventureInvestmentDTO.getName());
         ventureInvestment.setAddress(ventureInvestmentDTO.getAddress());
         ventureInvestment.setBusinessName(ventureInvestmentDTO.getBusinessName());
-        // 추가 필드 설정...
 
         if (ventureInvestmentDTO.getVentureId() != null) {
             VentureListInfo ventureInfo = new VentureListInfo();
             ventureInfo.setId(ventureInvestmentDTO.getVentureId()); // ventureId 설정
             ventureInvestment.setVentureListInfo(ventureInfo);
         }
-
         // 데이터베이스에 저장
         VentureInvestment savedVenture = ventureInvestmentRepository.save(ventureInvestment);
 
         return savedVenture.getId();
     }
 
-
     @Transactional
     public InvestorInvestment createInvestment(Member member, Long ventureId, Long price, String address,
-                                               String getBusinessName
-    ) {
-
+                                               String getBusinessName) {
         // 벤처 정보(VentureListInfo) 조회
         VentureListInfo ventureListInfo = ventureListInfoRepository.getReferenceById(ventureId);
         // 결제 정보 저장
@@ -158,8 +149,6 @@ public class InvestmentService {
 
         return dto;
     }
-
-
 
     @Transactional(readOnly = true)
     public Long getPrice(VentureListInfo ventureListInfo) {
