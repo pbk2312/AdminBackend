@@ -45,10 +45,10 @@ public class ContractController {
 
             InvestorInvestment investorInvestment = investorInvestmentRepository.getReferenceById(investorId);
             String investorEmail = investorInvestment.getInvestor().getEmail();
-
+            String userPassword = contract.getRandomPassword(); // 생성된 암호 가져오기
             String contractUrl = "/api/contract/" + contract.getContractId();
 
-            emailProvider.sendContractEmail(investorEmail,contractUrl);
+            emailProvider.sendContractEmail(investorEmail, contractUrl, userPassword);
 
 
             // contractId를 포함한 JSON 형태의 응답 반환
@@ -60,6 +60,7 @@ public class ContractController {
             response.put("memberId", String.valueOf(contract.getInvestorInvestment().getInvestor().getId()));
             response.put("filePath", contract.getFilePath());
             response.put("isGenerated", String.valueOf(contract.isGenerated()));
+            response.put("RandomPassword(userPassord)", userPassword);
 
 
 

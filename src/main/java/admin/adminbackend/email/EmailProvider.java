@@ -112,14 +112,20 @@ public class EmailProvider {
                 "IR 자료를 읽으시고 투지를 진행하실거면 해당 링크를 클릭해주세요: <a href=\"" + readUrl + "\">" + readUrl + "</a>";
     }
 
-    public boolean sendContractEmail(String to,String contractUrl) {
+    public boolean sendContractEmail(String to,String contractUrl, String userPassword) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
 
             // Setting the email content
-            String emailBody = "안녕하세요,<br><br>계약서를 저장하려면 아래 링크를 클릭하세요:<br>" +
-                    "<a href=\"" + "http://localhost:8080" + contractUrl + "\">" + contractUrl + "</a>";
+            /*String emailBody = "안녕하세요,<br><br>계약서를 저장하려면 아래 링크를 클릭하세요:<br>" +
+                    "<a href=\"" + "http://localhost:8080" + contractUrl + "\">" + contractUrl + "</a>";*/
+            String emailBody = "안녕하세요,<br><br>" +
+                    "계약서를 확인하려면 아래 링크를 클릭하세요:<br>" +
+                    "<a href=\"http://localhost:8080" + contractUrl + "\">" + contractUrl + "</a><br><br>" +
+                    "계약서를 열람하거나 다운로드하려면 아래 암호를 사용하세요:<br>" +
+                    "<strong>" + userPassword + "</strong><br><br>" +
+                    "감사합니다.";
 
             messageHelper.setTo(to);
             messageHelper.setText(emailBody, true);

@@ -12,6 +12,7 @@ import admin.adminbackend.investcontract.repository.InvestorInvestmentRepository
 import admin.adminbackend.investcontract.repository.VentureInvestmentRepository;
 import admin.adminbackend.service.member.MemberService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -50,7 +51,8 @@ public class ContractService {
 
         // Member에서 생년월일 조회
         Member member = investorInvestment.getInvestor();
-        String userPassword = member.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyyMMdd")); // 생년월일로 설정
+        //String userPassword = member.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyyMMdd")); // 생년월일로 설정
+        String userPassword = generateRandomPassword(); // 랜덤 비밀번호 생성
         String ownerPassword = "admin123"; // 고정된 암호 설정
         log.info("계약서 암호 user:{}, owner:{}", userPassword, ownerPassword);
 
@@ -59,6 +61,7 @@ public class ContractService {
         contract.setInvestorInvestment(investorInvestment);
         contract.setVentureInvestment(ventureInvestment);
         contract.setContractId(UUID.randomUUID().toString());
+        contract.setRandomPassword(userPassword);
 
         // 계약 저장
         contractInvestmentRepository.save(contract);
@@ -71,6 +74,10 @@ public class ContractService {
         return contract;
     }
 
+    // 랜덤 비밀번호 생성 메서드
+    private String generateRandomPassword() {
+        return RandomStringUtils.randomAlphanumeric(8); // 8자리 랜덤 문자열 생성
+    }
 
     private void createContractWithPDF(ContractInvestment contract, String ownerPassword, String userPassword) throws IOException {
         // 계약 정보를 DTO로 변환

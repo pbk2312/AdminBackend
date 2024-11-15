@@ -21,6 +21,7 @@ public class ContractInvestment {
 
     private boolean isGenerated;  //계약서 생성 여부
     private String filePath;
+    private String randomPassword;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "investor_investment_id", nullable = false)
