@@ -36,4 +36,11 @@ public class VentureListController {
             @RequestParam(defaultValue = "100") int size) {
         return ventureListService.getAllVentureList(page, size);
     }
+
+    @GetMapping("/searchByName")
+    @ResponseBody
+    public VentureListInfo searchByName(@RequestParam String name) {
+        return ventureListService.findByNameExact(name);
+    }
+
 }

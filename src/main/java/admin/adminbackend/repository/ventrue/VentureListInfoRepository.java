@@ -23,5 +23,6 @@ public interface VentureListInfoRepository extends JpaRepository<VentureListInfo
             "FROM VentureListInfo v")
     Page<VentureListInfo> findAll(Pageable pageable); // 전체 기업 목록 조회 페이징 처리
 
+    Optional<VentureListInfo> findByNameIgnoreCase(String name);
 
 }

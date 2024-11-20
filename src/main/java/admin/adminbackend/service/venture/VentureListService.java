@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.NoSuchElementException;
 
 @Service
 @Log4j2
@@ -106,6 +107,11 @@ public class VentureListService {
         entityManager.refresh(ventureListInfo);
 
         return ventureListInfo;
+    }
+
+    public VentureListInfo findByNameExact(String name) {
+        return ventureListInfoRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> new NoSuchElementException("해당 기업을 찾을 수 없습니다."));
     }
 }
 
